@@ -1,0 +1,34 @@
+﻿<Window x:Class="ManualsLib.AddDocument"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ManualsLib"
+        mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        Title="AviComp VietNam/ Document Control" Height="600" Width="400" Icon="/download.png">
+    <Grid Background="LightGray" Width="400" Height="600" Margin="0,0,0,-16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Label Content="Add Document" Width="400" Height="50" FontSize="20" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"                             />
+        <!--Brandname selector-->
+        <Label Margin="20,120,300,450" Width="80" Height="30" >Brand name:</Label>
+        <ComboBox x:Name="brandName"  Margin="135,120,115,450" Width="150" Height="30"/>
+        <!--Title selector-->
+        <Label Margin="20,160,300,410" Width="80" Height="30"  >Title:</Label>
+        <TextBox x:Name="Title" TextWrapping="Wrap" Width="150" Height="30" Margin="135,160,115,410"/>
+        <!--Model selector-->
+        <Label Margin="20,201,300,369" Width="80" Height="30"  >Model:</Label>
+        <TextBox x:Name="Model" TextWrapping="Wrap" Width="150" Height="30" Margin="135,201,115,369"/>
+        <!--Revision selector-->
+        <Label Margin="20,240,300,330" Width="80" Height="30"  >Revision:</Label>
+        <TextBox x:Name="Revision" TextWrapping="Wrap" Width="150" Height="30" Margin="135,240,115,330"/>
+        <!--Source file pdf selector-->
+        <Label Margin="20,281,300,289" Width="80" Height="30"  >Source:</Label>
+        <!--path to source file-->
+        <TextBox x:Name="desPdfPath" TextWrapping="Wrap" Width="200" Height="60" Margin="160,288,40,252" Background="LightGray" BorderBrush="LightGray"/>
+        <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="137,290,243,290" Click="desPdf_Click"/>
+        <TextBox x:Name="CheckResult" Text="nothing" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170"/>
+        <!--Add button-->
+        <Button x:Name="Add" Content="Add"  Width="50" Height="25" Margin="85,467,265,108" Click="Add_Click"/>
+        <Button Content="Next Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="227,445,73,105"/>
+    </Grid>
+</Window>
