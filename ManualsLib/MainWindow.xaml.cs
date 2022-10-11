@@ -40,5 +40,12 @@ namespace ManualsLib
             this.Close();
 
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            EditDocument editDocument = new EditDocument();
+            editDocument.Show();
+            this.Close();
+        }
     }
 }

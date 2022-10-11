@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManualsLib"
         mc:Ignorable="d"
-        
-        Title="AviComp VietNam/ Document Control" Height="600" Width="400" Icon="/download.png">
-    <Grid>
-        <Button Content="Next Page" Width="100" Height="50" Hyperlink.Click="Button_Click"></Button>
+        Background="DarkGray"
+        Title="AviComp VietNam" Height="400" Width="200" Icon="/download.png">
+    <Grid Width="200" Height="500">
+        <Button Content="Add Document" Width="100" Height="50" Hyperlink.Click="Button_Click" Margin="50,61,50,373"></Button>
+        <Button Content="Delete Document" Width="100" Height="50" Hyperlink.Click="Button_Click_1"  Margin="50,153,50,281"></Button>
         
     </Grid>
 </Window>

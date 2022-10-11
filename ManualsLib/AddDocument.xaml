@@ -24,11 +24,11 @@
         <!--Source file pdf selector-->
         <Label Margin="20,281,300,289" Width="80" Height="30"  >Source:</Label>
         <!--path to source file-->
-        <TextBox x:Name="desPdfPath" TextWrapping="Wrap" Width="200" Height="60" Margin="160,288,40,252" Background="LightGray" BorderBrush="LightGray"/>
+        <TextBox x:Name="desPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="160,288,40,252" Background="LightGray" BorderBrush="LightGray"/>
         <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="137,290,243,290" Click="desPdf_Click"/>
-        <TextBox x:Name="CheckResult" Text="nothing" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170"/>
+        <TextBox x:Name="CheckResult" IsReadOnly="True" Text="nothing" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170"/>
         <!--Add button-->
         <Button x:Name="Add" Content="Add"  Width="50" Height="25" Margin="85,467,265,108" Click="Add_Click"/>
-        <Button Content="Next Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="227,445,73,105"/>
+        <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="227,445,73,105"/>
     </Grid>
 </Window>

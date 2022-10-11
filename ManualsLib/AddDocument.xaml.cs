@@ -26,9 +26,10 @@ namespace ManualsLib
         {
             InitializeComponent();
         }
-        public string pathDes = "";
+        public string pathSource = "";
         public string templateBrandBrand = "";
-
+        public string currPath = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().IndexOf("Database"));//get the current path of Database folder
+        
 
 
 
@@ -36,7 +37,7 @@ namespace ManualsLib
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //Read file Brand to creat drop-dow selection box for Category assign to array "arrlocalBrand"
-            string filename = "C:\\Users\\dtran\\Documents\\02.Equipment Manual\\99.ManualsLibrary\\Database\\Brand.txt";
+            string filename =currPath + "Database\\Brand.txt";
             string localBrand = File.ReadAllText(filename);
             var arrlocalBrand = localBrand.Split(';');
             brandName.ItemsSource = arrlocalBrand.ToList();
@@ -49,7 +50,7 @@ namespace ManualsLib
             }
             brandList = brandList + "\"Edit\"";
             //Open Index.html =>edit => save
-            string Database = "C:\\Users\\dtran\\Documents\\02.Equipment Manual\\99.ManualsLibrary\\Index.html";
+            string Database = currPath + "\\Index.html";
             string index = File.ReadAllText(Database);
             int startpoint = index.IndexOf("\"About\"");
             int endpoint = index.IndexOf("\"Edit\"");
@@ -58,7 +59,7 @@ namespace ManualsLib
             string indextemp = index.Remove(startpoint, endpoint - startpoint + 6);
             indextemp = indextemp.Insert(startpoint, brandList);
             File.WriteAllText(Database, indextemp);
-            CheckResult.Text = CheckResult.Text + indextemp;
+            CheckResult.Text = CheckResult.Text + currPath;
         }
 
         private void desPdf_Click(object sender, RoutedEventArgs e)
@@ -71,7 +72,7 @@ namespace ManualsLib
             {
                 string filePath = openDesPdf.FileName;
                 desPdfPath.Text = filePath;
-                pathDes = filePath;
+                pathSource = filePath;
             }
 
         }
@@ -79,14 +80,15 @@ namespace ManualsLib
         private void Add_Click(object sender, RoutedEventArgs e)
         {
             //load file brand based on selection and open, insert templateBrand to file
+            
             string Database = "C:\\Users\\dtran\\Documents\\02.Equipment Manual\\99.ManualsLibrary\\Database\\";
             string outputBrand = "";
             string inputBrand = "";
             string filename = "";
             //file name.pdf
-            string namePdf = pathDes.Substring(pathDes.LastIndexOf("\\") + 1, pathDes.Length - pathDes.LastIndexOf("\\") - 1);
+            string namePdf = pathSource.Substring(pathSource.LastIndexOf("\\") + 1, pathSource.Length - pathSource.LastIndexOf("\\") - 1);
             //templateBrand string add to brand name
-            string templateBrand = "\\\\Add new" + namePdf + "\n" + "<tr>" + "\n";
+            string templateBrand = "<!--Add new " + Model.Text + "-->" + "\n" + "<tr>" + "\n";
             templateBrand = templateBrand + "<td class=\"TableBody\" valigned=\"top\">" + "\n";
             templateBrand = templateBrand + "<a href=\"" + namePdf + "\" target=\"_blank\">" + Title.Text + "</a>" + "\n";
             templateBrand = templateBrand + " </td>" + "\n";
@@ -97,18 +99,20 @@ namespace ManualsLib
             templateBrand = templateBrand + Revision.Text + "\n";
             templateBrand = templateBrand + "</td>" + "\n";
             templateBrand = templateBrand + "</tr>" + "\n";
+            templateBrand = templateBrand + "<!--Add new " + Model.Text + "-->" + "\n";
             //open file Brand.html => add => save
             try
             {
                 //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
-                File.Copy(pathDes, namePdf);
+                File.Copy(pathSource,currPath+ "Database\\"+namePdf);
                 filename = Database + brandName.SelectedItem.ToString() + ".html";
                 inputBrand = File.ReadAllText(filename);
                 int insertPos = (int)inputBrand.LastIndexOf(" </table>");
                 outputBrand = inputBrand.Insert(insertPos, templateBrand);
+                outputBrand = outputBrand.Insert(outputBrand.LastIndexOf("IndexModel-->"), Model.Text + ";"+ "\n");
                 File.WriteAllText(filename, outputBrand);
                 //open file Index.html => save Brand index to file 
-
+                CheckResult.Text = $"Added database of model: {Model.Text}";
             }
             catch (Exception ex)
             {
