@@ -12,6 +12,7 @@
         <!--Brandname selector-->
         <Label Margin="20,120,300,450" Width="80" Height="30" >Brand name:</Label>
         <ComboBox x:Name="brandName"  Margin="135,120,115,450" Width="150" Height="30"/>
+        <TextBox x:Name="newBrand"  Margin="307,120,23,450" Width="70" Height="30"/>
         <!--Title selector-->
         <Label Margin="20,160,300,410" Width="80" Height="30"  >Title:</Label>
         <TextBox x:Name="Title" TextWrapping="Wrap" Width="150" Height="30" Margin="135,160,115,410"/>
@@ -26,9 +27,10 @@
         <!--path to source file-->
         <TextBox x:Name="desPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="160,288,40,252" Background="LightGray" BorderBrush="LightGray"/>
         <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="137,290,243,290" Click="desPdf_Click"/>
-        <TextBox x:Name="CheckResult" IsReadOnly="True" Text="nothing" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170"/>
+        <TextBox x:Name="CheckResult" IsReadOnly="True" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170"/>
         <!--Add button-->
-        <Button x:Name="Add" Content="Add"  Width="50" Height="25" Margin="85,467,265,108" Click="Add_Click"/>
-        <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="227,445,73,105"/>
+        <Button x:Name="AddDoc" Content="Insert Document"  Width="100" Height="30" Margin="20,467,280,103" Click="AddDoc_Click"/>
+        <Button x:Name="AddBrand" Content="Insert Brand"  Width="100" Height="30" Margin="150,467,150,103" Click="AddBrand_Click"/>
+        <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="288,447,12,103"/>        
     </Grid>
 </Window>
