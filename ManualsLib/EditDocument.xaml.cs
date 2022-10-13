@@ -38,7 +38,7 @@ namespace ManualsLib
         public string endRev = "</td>";
         public string startpdf = "href=\"";//6
         public string endpdf = "target";
-
+        public string ThongBao = "";
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -82,7 +82,7 @@ namespace ManualsLib
         }
         private void brandName_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string filename = currPath + "Database\\" + brandName.SelectedItem + ".html";
+            string filename = currPath + "Database\\" +brandName.SelectedItem.ToString()+ "\\"+ brandName.SelectedItem + ".html";
             string tempBrand = File.ReadAllText(filename);
             string IndexModel = tempBrand.Substring(tempBrand.IndexOf("<!--IndexModel")+14, tempBrand.LastIndexOf("IndexModel-->") - tempBrand.IndexOf("<!--IndexModel")-14);
             var arrIndexModel = IndexModel.Trim().Split(";");
@@ -100,7 +100,7 @@ namespace ManualsLib
             {
                 string namePdf = pathSource.Substring(pathSource.LastIndexOf("\\") + 1, pathSource.Length - pathSource.LastIndexOf("\\") - 1);
                 string templateIndexModel = "<!--Add new " + Model.SelectedItem.ToString() + "-->";
-                string filename = currPath + "Database\\" + brandName.SelectedItem + ".html";
+                string filename = currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
                 string tempBrand = File.ReadAllText(filename);
                 int posModel = tempBrand.IndexOf(templateIndexModel);
                 int lastModel = tempBrand.LastIndexOf(templateIndexModel);
@@ -149,7 +149,7 @@ namespace ManualsLib
             //{
                 //search table data of Model selected in brandName.html and delete all code, search pdf name and delete in folder as well, delete index of Model in <!--IndexModel in brandName.html
                 string templateIndexModel = "<!--Add new " + Model.SelectedItem.ToString() + "-->";                
-                string filename = currPath + "Database\\" + brandName.SelectedItem + ".html";
+                string filename = currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
                 string tempBrand = File.ReadAllText(filename);
                 int posModel = tempBrand.IndexOf(templateIndexModel);
                 string pdfname = tempBrand.Substring(tempBrand.IndexOf(startpdf, posModel) + 6, tempBrand.IndexOf(endpdf, posModel) - tempBrand.IndexOf("href=\"", posModel) - 8);
@@ -183,7 +183,7 @@ namespace ManualsLib
         {
             if(Model.SelectedItem!=null)
             {
-                string filename = currPath + "Database\\" + brandName.SelectedItem + ".html";
+                string filename = currPath + "Database\\" + brandName.SelectedItem.ToString()+"\\"+ brandName.SelectedItem.ToString() + ".html";
                 string tempBrand = File.ReadAllText(filename);
                 string templateIndexModel = "<!--Add new " + Model.SelectedItem.ToString() + "-->";
                 int posModel = tempBrand.IndexOf(templateIndexModel);
@@ -194,9 +194,59 @@ namespace ManualsLib
                 string oldRev = tempBrand.Substring(tempBrand.LastIndexOf(startRev,lastModel,lastModel-posModel-1)+6,tempBrand.LastIndexOf(endRev,lastModel,lastModel-posModel-1)- tempBrand.LastIndexOf(startRev, lastModel, lastModel - posModel - 1)-6).Trim();
                 Revision.Text = oldRev;
                 string pdfname = tempBrand.Substring(tempBrand.IndexOf(startpdf, posModel) + 6, tempBrand.IndexOf(endpdf, posModel) - tempBrand.IndexOf("href=\"", posModel) - 8);
-                desPdfPath.Text = currPath + "Database\\" + pdfname;
+                desPdfPath.Text = currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + pdfname;
+                string patha = currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + pdfname;
+                if (!File.Exists(patha))
+                {
+                    ThongBao = $"Document don't exist in path {currPath}Database\\{brandName.SelectedItem.ToString()}";
+                }
+                CheckResult.Text = ThongBao;
             }    
             
+        }
+
+        private void DeleteBrand_Click(object sender, RoutedEventArgs e)
+        {
+            Directory.Delete(currPath + "Database\\" + brandName.SelectedItem.ToString(),true);
+            string inputBrand = File.ReadAllText(currPath + "\\Database\\Brand.txt");
+            outputBrand = inputBrand.Replace(brandName.SelectedItem.ToString()+";", "");
+            File.WriteAllText(currPath + "\\Database\\Brand.txt", outputBrand);
+        }
+        private void Sub_Window_Loaded()
+        {
+            string filename = currPath + "Database\\Brand.txt";
+            string localBrand = File.ReadAllText(filename);
+            var arrlocalBrand = localBrand.Split(';');
+            brandName.ItemsSource = arrlocalBrand.ToList();
+
+            //Load brand name from Brand.txt
+            string brandList = "";
+            foreach (var it in arrlocalBrand)
+            {
+                brandList = brandList + "\"" + it + "\"" + ",";
+            }
+            brandList = brandList + "\"Edit\"";
+            //Open Index.html =>edit => save
+            string Database = currPath + "\\Index.html";
+            string index = File.ReadAllText(Database);
+            int startpoint = index.IndexOf("\"About\"");
+            int endpoint = index.IndexOf("\"Edit\"");
+            int ttlength = index.Length;
+            string indextemp = index.Remove(startpoint, endpoint - startpoint + 6);
+            indextemp = indextemp.Insert(startpoint, brandList);
+            File.WriteAllText(Database, indextemp);
+        }
+        private void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            Title.Text = "";
+            newTitle.Text = "";
+            Model.SelectedIndex = -1;
+            Revision.Text = "";
+            newRevision.Text = "";
+            desPdfPath.Text = "";
+            newdesPdfPath.Text = "";
+            CheckResult.Text = "";
+            Sub_Window_Loaded();
         }
     }
 }

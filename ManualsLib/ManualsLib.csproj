@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <None Remove="download.png" />
+    <None Remove="refresh.jpg" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="download.png" />
+    <Resource Include="refresh.jpg" />
   </ItemGroup>
 
 </Project>

@@ -36,12 +36,17 @@
         <TextBox x:Name="CheckResult" IsReadOnly="True" Text="nothing" TextWrapping="Wrap" Width="400" Height="60" Margin="48,370,152,170"/>
         <!--Delete button-->
         <Button x:Name="Delete" Content="Delete"  Width="50" Height="25" Margin="133,467,417,108" Click="Delete_Click"/>
-        <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="275,445,225,105"/>
+        <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="395,445,105,105"/>
         <!---Change button-->
         <Button x:Name="Change" Content="Change"  Width="50" Height="25" Margin="201,467,349,108" Click="Change_Click"/>
         <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,162,0,0" VerticalAlignment="Top"/>
         <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,204,0,0" VerticalAlignment="Top"/>
         <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,242,0,0" VerticalAlignment="Top"/>
-
+        <Button x:Name="DeleteBrand" Content="Delete Brand"  Width="50" Height="25" Margin="283,467,267,108" Click="DeleteBrand_Click"/>
+        <Button x:Name="refresh" Width="20" Height="20" Margin="18,12,362,568" Click="Refresh_Click">
+            <Button.Content>
+                <Image  Source="/refresh.jpg" StretchDirection="Both"/>
+            </Button.Content>
+        </Button>
     </Grid>
 </Window>

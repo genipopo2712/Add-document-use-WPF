@@ -65,45 +65,56 @@ namespace ManualsLib
             string filename = "";
             //file name.pdf
             string namePdf = pathSource.Substring(pathSource.LastIndexOf("\\") + 1, pathSource.Length - pathSource.LastIndexOf("\\") - 1);
-            //templateBrand string add to brand name
-            //string templateBrand = "<!--Add new " + Model.Text + "-->" + "\n" + "<tr>" + "\n";
-            //templateBrand = templateBrand + "<td class=\"TableBody\" valigned=\"top\">" + "\n";
-            //templateBrand = templateBrand + "<a href=\"" + namePdf + "\" target=\"_blank\">" + Title.Text + "</a>" + "\n";
-            //templateBrand = templateBrand + " </td>" + "\n";
-            //templateBrand = templateBrand + " <td class=\"TableBody\" align=\"center\" valigned=\"top\">" + "\n";
-            //templateBrand = templateBrand + Model.Text + "\n";
-            //templateBrand = templateBrand + "</td>" + "\n";
-            //templateBrand = templateBrand + "<td class=\"TableBody\" align=\"center\" valigned=\"top\">" + "\n";
-            //templateBrand = templateBrand + Revision.Text + "\n";
-            //templateBrand = templateBrand + "</td>" + "\n";
-            //templateBrand = templateBrand + "</tr>" + "\n";
-            //templateBrand = templateBrand + "<!--Add new " + Model.Text + "-->" + "\n";
-            //open file Brand.html => add => save
             string templateBrand = "<!--Add new " + Model.Text + "-->" + "\n" + "<tr>" + "\n" + templateDoc + "<!--Add new " + Model.Text + "-->" + "\n";
-            try
+            if (Title.Text=="" || Model.Text=="" || desPdfPath.Text=="")
             {
-                templateBrand = templateBrand.Replace("outputpdfPath", namePdf);//outputpdfPath in template 
-                templateBrand = templateBrand.Replace("outputTitle", Title.Text);//outputTitle
-                templateBrand = templateBrand.Replace("outputModel", Model.Text);//outputModel
-                templateBrand = templateBrand.Replace("outputRevision", Revision.Text);//outputRevision
-                //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
-                File.Copy(pathSource,currPath+ "Database\\" + Model.Text + "\\" +namePdf);
-                filename = currPath + "\\Database\\" + Model.Text + "\\" + brandName.SelectedItem.ToString() + ".html";
-                inputBrand = File.ReadAllText(filename);
-                int insertPos = (int)inputBrand.LastIndexOf(" </table>");
-                outputBrand = inputBrand.Insert(insertPos, templateBrand);
-                outputBrand = outputBrand.Insert(outputBrand.LastIndexOf("IndexModel-->"), Model.Text + ";"+ "\n");
-                File.WriteAllText(filename, outputBrand);
-                //open file Index.html => save Brand index to file 
-                ThongBao= $"Added database of model: {Model.Text}";
-                CheckResult.Text = ThongBao;
+                if (Title.Text == "")
+                    ThongBao = "Tittle cannot empty.";
+                else
+                {
+                    if (Model.Text == "")
+                        ThongBao = "Model cannot empty";
+                    else
+                    {
+                        filename = currPath + "\\Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
+                        inputBrand = File.ReadAllText(filename);
+                        if (inputBrand.Contains(Model.Text))
+                            ThongBao = "Model is already existed.";
+                        else
+                        {
+                            if (desPdfPath.Text == "")
+                                ThongBao = "Please add document";
+                        }
+                    }
+                }
             }
-            catch (Exception ex)
+            else
             {
-                CheckResult.Text = ex.Message;
+                try
+                {   
+                    templateBrand = templateBrand.Replace("outputpdfPath", namePdf);//outputpdfPath in template 
+                    templateBrand = templateBrand.Replace("outputTitle", Title.Text);//outputTitle
+                    templateBrand = templateBrand.Replace("outputModel", Model.Text);//outputModel
+                    templateBrand = templateBrand.Replace("outputRevision", Revision.Text);//outputRevision
+                                                                                           //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
+                    File.Copy(pathSource, currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + namePdf);
+                    filename = currPath + "\\Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
+                    inputBrand = File.ReadAllText(filename);
+                    int insertPos = (int)inputBrand.LastIndexOf(" </table>");
+                    outputBrand = inputBrand.Insert(insertPos, templateBrand);
+                    outputBrand = outputBrand.Insert(outputBrand.LastIndexOf("IndexModel-->"), Model.Text + ";" + "\n");
+                    File.WriteAllText(filename, outputBrand);
+                    //open file Index.html => save Brand index to file 
+                    ThongBao = $"Added database of model: {Model.Text}";                    
+                }
+                catch (Exception ex)
+                {
+                    CheckResult.Text = ex.Message;
+                }
             }
+            CheckResult.Text = ThongBao;
         }
-
+        s
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = new MainWindow();
@@ -130,10 +141,9 @@ namespace ManualsLib
                 string outputIndex = inputIndex + ";" + folderName;
                 File.WriteAllText(currPath + "\\Database\\Brand.txt", outputIndex);
                 ThongBao = "Added folder database for " + newBrand.Text;
+                Sub_Window_Loaded();
             }
             CheckResult.Text = ThongBao;
-            Sub_Window_Loaded();
-            this.refresh
         }
         private void SubloadTemplate()
         {
@@ -148,6 +158,7 @@ namespace ManualsLib
             string localBrand = File.ReadAllText(filename);
             var arrlocalBrand = localBrand.Split(';');
             brandName.ItemsSource = arrlocalBrand.ToList();
+            
             //Load brand name from Brand.txt
             string brandList = "";
             foreach (var it in arrlocalBrand)
@@ -161,11 +172,24 @@ namespace ManualsLib
             int startpoint = index.IndexOf("\"About\"");
             int endpoint = index.IndexOf("\"Edit\"");
             int ttlength = index.Length;
-            CheckResult.Text = CheckResult.Text + startpoint + ";" + endpoint + "\n";
             string indextemp = index.Remove(startpoint, endpoint - startpoint + 6);
+            string parentPath = currPath.Replace("\\", "\\\\");
             indextemp = indextemp.Insert(startpoint, brandList);
+            indextemp = indextemp.Remove(indextemp.IndexOf("index1 = ")+10, indextemp.IndexOf(";//index1")- indextemp.IndexOf("index1 = ")-11);
+            indextemp = indextemp.Insert(indextemp.IndexOf("index1 = ")+10, parentPath+"Database");
             File.WriteAllText(Database, indextemp);
             ThongBao = "Template add document: " + "\n" + templateDoc;
+        }
+
+        private void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            Title.Text = "";
+            Model.Text = "";
+            Revision.Text = "";
+            desPdfPath.Text = "";
+            newBrand.Text = "";
+            CheckResult.Text = "";
+            Sub_Window_Loaded();
         }
     }
 }
