@@ -51,7 +51,7 @@ namespace ManualsLib
                 brandName.ItemsSource = arrlocalBrand.ToList();
                 CheckResult.Text = "";
                 //Load brand name from Brand.txt
-                string brandList = "";
+                string brandList = "\"About\",";
                 foreach (var it in arrlocalBrand)
                 {
                     brandList = brandList + "\"" + it + "\"" + ",";
@@ -82,16 +82,19 @@ namespace ManualsLib
         }
         private void brandName_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string filename = currPath + "Database\\" +brandName.SelectedItem.ToString()+ "\\"+ brandName.SelectedItem + ".html";
-            string tempBrand = File.ReadAllText(filename);
-            string IndexModel = tempBrand.Substring(tempBrand.IndexOf("<!--IndexModel")+14, tempBrand.LastIndexOf("IndexModel-->") - tempBrand.IndexOf("<!--IndexModel")-14);
-            var arrIndexModel = IndexModel.Trim().Split(";");
-            arrIndexModel = arrIndexModel.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-            for (int i = 0; i < arrIndexModel.Length; i++)
+            if(brandName.SelectedItem!=null)
             {
-                arrIndexModel[i] = arrIndexModel[i].Trim();
-            }            
-            Model.ItemsSource = arrIndexModel.ToList();
+                string filename = currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem + ".html";
+                string tempBrand = File.ReadAllText(filename);
+                string IndexModel = tempBrand.Substring(tempBrand.IndexOf("<!--IndexModel") + 14, tempBrand.LastIndexOf("IndexModel-->") - tempBrand.IndexOf("<!--IndexModel") - 14);
+                var arrIndexModel = IndexModel.Trim().Split(";");
+                arrIndexModel = arrIndexModel.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                for (int i = 0; i < arrIndexModel.Length; i++)
+                {
+                    arrIndexModel[i] = arrIndexModel[i].Trim();
+                }
+                Model.ItemsSource = arrIndexModel.ToList();
+            }                
         }
 
         private void Change_Click(object sender, RoutedEventArgs e)
@@ -140,6 +143,7 @@ namespace ManualsLib
             {
                 CheckResult.Text = ex.Message;
             }
+            Sub_Window_Loaded();
 
 }
 
@@ -220,7 +224,7 @@ namespace ManualsLib
             brandName.ItemsSource = arrlocalBrand.ToList();
 
             //Load brand name from Brand.txt
-            string brandList = "";
+            string brandList = "\"About\",";
             foreach (var it in arrlocalBrand)
             {
                 brandList = brandList + "\"" + it + "\"" + ",";
@@ -246,6 +250,7 @@ namespace ManualsLib
             desPdfPath.Text = "";
             newdesPdfPath.Text = "";
             CheckResult.Text = "";
+            brandName.SelectedIndex = -1;
             Sub_Window_Loaded();
         }
     }

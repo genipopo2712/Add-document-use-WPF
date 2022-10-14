@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace ManualsLib
 {
@@ -32,15 +33,15 @@ namespace ManualsLib
         //public string templateBrand = "";
         public string templateDoc = "";
         public string oCurrBrand = "";
-       
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            SubloadTemplate();            
+            SubloadTemplate();
             Sub_Window_Loaded();
             CheckResult.Text = ThongBao;
         }
-        
+
 
         private void desPdf_Click(object sender, RoutedEventArgs e)
         {
@@ -63,58 +64,73 @@ namespace ManualsLib
             string outputBrand = "";
             string inputBrand = "";
             string filename = "";
+            string inputModel = "";
+            bool match = false;
+
             //file name.pdf
             string namePdf = pathSource.Substring(pathSource.LastIndexOf("\\") + 1, pathSource.Length - pathSource.LastIndexOf("\\") - 1);
             string templateBrand = "<!--Add new " + Model.Text + "-->" + "\n" + "<tr>" + "\n" + templateDoc + "<!--Add new " + Model.Text + "-->" + "\n";
-            if (Title.Text=="" || Model.Text=="" || desPdfPath.Text=="")
+            if (Title.Text == "" || Model.Text == "" || desPdfPath.Text == "")
             {
                 if (Title.Text == "")
                     ThongBao = "Tittle cannot empty.";
                 else
                 {
+
                     if (Model.Text == "")
                         ThongBao = "Model cannot empty";
                     else
                     {
-                        filename = currPath + "\\Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
-                        inputBrand = File.ReadAllText(filename);
-                        if (inputBrand.Contains(Model.Text))
-                            ThongBao = "Model is already existed.";
-                        else
-                        {
-                            if (desPdfPath.Text == "")
-                                ThongBao = "Please add document";
-                        }
+                        if (desPdfPath.Text == "")
+                            ThongBao = "Please add document";
                     }
                 }
             }
             else
             {
-                try
-                {   
-                    templateBrand = templateBrand.Replace("outputpdfPath", namePdf);//outputpdfPath in template 
-                    templateBrand = templateBrand.Replace("outputTitle", Title.Text);//outputTitle
-                    templateBrand = templateBrand.Replace("outputModel", Model.Text);//outputModel
-                    templateBrand = templateBrand.Replace("outputRevision", Revision.Text);//outputRevision
-                                                                                           //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
-                    File.Copy(pathSource, currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + namePdf);
-                    filename = currPath + "\\Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
-                    inputBrand = File.ReadAllText(filename);
-                    int insertPos = (int)inputBrand.LastIndexOf(" </table>");
-                    outputBrand = inputBrand.Insert(insertPos, templateBrand);
-                    outputBrand = outputBrand.Insert(outputBrand.LastIndexOf("IndexModel-->"), Model.Text + ";" + "\n");
-                    File.WriteAllText(filename, outputBrand);
-                    //open file Index.html => save Brand index to file 
-                    ThongBao = $"Added database of model: {Model.Text}";                    
-                }
-                catch (Exception ex)
+                string tb = "";
+                filename = currPath + "\\Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
+                inputBrand = File.ReadAllText(filename);
+                string[] arrModel = inputBrand.Substring(inputBrand.IndexOf("<!--IndexModel") + 14, inputBrand.LastIndexOf("IndexModel-->") - inputBrand.IndexOf("<!--IndexModel") - 14).Trim().Split(";");
+                inputModel = Sub_String_To_String(Model.Text);
+                foreach (var it in arrModel)
                 {
-                    CheckResult.Text = ex.Message;
+                    if (inputModel == Sub_String_To_String(it))
+                    {
+                        tb = tb + it + "\n";
+                    }
                 }
+                if (tb != "")
+                    ThongBao = $"Model existed. Check model: {tb}";
+                else
+                {
+                    try
+                    {
+                        templateBrand = templateBrand.Replace("outputpdfPath", namePdf);//outputpdfPath in template 
+                        templateBrand = templateBrand.Replace("outputTitle", Title.Text);//outputTitle
+                        templateBrand = templateBrand.Replace("outputModel", Model.Text);//outputModel
+                        templateBrand = templateBrand.Replace("outputRevision", Revision.Text);//outputRevision
+                                                                                               //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
+                        File.Copy(pathSource, currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + namePdf);
+                        filename = currPath + "\\Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
+                        inputBrand = File.ReadAllText(filename);
+                        int insertPos = (int)inputBrand.LastIndexOf(" </table>");
+                        outputBrand = inputBrand.Insert(insertPos, templateBrand);
+                        outputBrand = outputBrand.Insert(outputBrand.LastIndexOf("IndexModel-->"), Model.Text + ";" + "\n");
+                        File.WriteAllText(filename, outputBrand);
+                        //open file Index.html => save Brand index to file 
+                        ThongBao = $"Added database of model: {Model.Text}";
+                    }
+                    catch (Exception ex)
+                    {
+                        CheckResult.Text = ex.Message;
+                    }
+                }
+
             }
             CheckResult.Text = ThongBao;
         }
-        s
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = new MainWindow();
@@ -136,7 +152,7 @@ namespace ManualsLib
                 Directory.CreateDirectory(currPath + "\\Database\\" + folderName);
                 string inputBrand = File.ReadAllText(currPath + "\\Database\\" + "Template.html");
                 outputBrand = inputBrand.Replace("brandnameheader", folderName);
-                File.WriteAllText(currPath + "\\Database\\" + folderName + "\\" + folderName +".html",outputBrand);
+                File.WriteAllText(currPath + "\\Database\\" + folderName + "\\" + folderName + ".html", outputBrand);
                 string inputIndex = File.ReadAllText(currPath + "\\Database\\" + "Brand.txt");
                 string outputIndex = inputIndex + ";" + folderName;
                 File.WriteAllText(currPath + "\\Database\\Brand.txt", outputIndex);
@@ -158,9 +174,9 @@ namespace ManualsLib
             string localBrand = File.ReadAllText(filename);
             var arrlocalBrand = localBrand.Split(';');
             brandName.ItemsSource = arrlocalBrand.ToList();
-            
+
             //Load brand name from Brand.txt
-            string brandList = "";
+            string brandList = "\"About\";";
             foreach (var it in arrlocalBrand)
             {
                 brandList = brandList + "\"" + it + "\"" + ",";
@@ -175,10 +191,54 @@ namespace ManualsLib
             string indextemp = index.Remove(startpoint, endpoint - startpoint + 6);
             string parentPath = currPath.Replace("\\", "\\\\");
             indextemp = indextemp.Insert(startpoint, brandList);
-            indextemp = indextemp.Remove(indextemp.IndexOf("index1 = ")+10, indextemp.IndexOf(";//index1")- indextemp.IndexOf("index1 = ")-11);
-            indextemp = indextemp.Insert(indextemp.IndexOf("index1 = ")+10, parentPath+"Database");
+            indextemp = indextemp.Remove(indextemp.IndexOf("index1 = ") + 10, indextemp.IndexOf(";//index1") - indextemp.IndexOf("index1 = ") - 11);
+            indextemp = indextemp.Insert(indextemp.IndexOf("index1 = ") + 10, parentPath + "Database");
             File.WriteAllText(Database, indextemp);
-            ThongBao = "Template add document: " + "\n" + templateDoc;
+        }
+
+        private string Sub_String_To_String(string a)//input string output string without special character
+        {
+            string iModel = a;
+            string output = "";
+            Regex alphabet = new Regex("[a-zA-Z0-9]");
+            string[] iStr = alphabet.Split(iModel);
+            string sCh = "\\n|";
+            string temp = "";
+            foreach (var i in iStr)
+            {
+                temp = temp + i.Trim();
+            }
+            temp = temp.Trim();
+            if (temp != "")
+            {
+                foreach (var ch in iStr)
+                {
+                    if (ch != "")
+                    {
+                        sCh = sCh + "\\" + ch + "|";
+                    }
+                }
+                sCh = sCh.Remove(sCh.Length - 1);
+                Regex speCh = new Regex(sCh);
+                string[] Str = speCh.Split(iModel);
+                ThongBao = "";
+                foreach (var it in Str)
+                {
+                    output = output + it;
+                }
+                output = output.ToLower();
+            }
+            else
+            {
+                Regex speCh2 = new Regex("\n");
+                string[] arrout = speCh2.Split(iModel);
+                foreach (var item in arrout)
+                {
+                    output = output + item;
+                }
+            }
+
+            return output;
         }
 
         private void Refresh_Click(object sender, RoutedEventArgs e)
@@ -191,5 +251,7 @@ namespace ManualsLib
             CheckResult.Text = "";
             Sub_Window_Loaded();
         }
+
+
     }
 }
