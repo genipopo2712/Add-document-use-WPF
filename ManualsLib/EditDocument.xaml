@@ -42,7 +42,7 @@
         <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,162,0,0" VerticalAlignment="Top"/>
         <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,204,0,0" VerticalAlignment="Top"/>
         <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,242,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="DeleteBrand" Content="Delete Brand"  Width="50" Height="25" Margin="283,467,267,108" Click="DeleteBrand_Click"/>
+        <Button x:Name="DeleteBrand" Content="Delete Brand"  Width="90" Height="25" Margin="283,467,227,108" Click="DeleteBrand_Click"/>
         <Button x:Name="refresh" Width="20" Height="20" Margin="18,12,362,568" Click="Refresh_Click">
             <Button.Content>
                 <Image  Source="/refresh.jpg" StretchDirection="Both"/>

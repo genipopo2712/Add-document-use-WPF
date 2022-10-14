@@ -14,6 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Drive.v3;
+using Google.Apis.Services;
 
 namespace ManualsLib
 {
@@ -34,7 +37,7 @@ namespace ManualsLib
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            
+
             AddDocument addDocument = new AddDocument();
             addDocument.Show();
             this.Close();
@@ -47,5 +50,13 @@ namespace ManualsLib
             editDocument.Show();
             this.Close();
         }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            AddDocDrive addDocDrive = new AddDocDrive();
+            addDocDrive.Show();
+            this.Close();
+        }
     }
 }
+ 

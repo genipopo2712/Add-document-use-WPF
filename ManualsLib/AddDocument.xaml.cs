@@ -65,7 +65,6 @@ namespace ManualsLib
             string inputBrand = "";
             string filename = "";
             string inputModel = "";
-            bool match = false;
 
             //file name.pdf
             string namePdf = pathSource.Substring(pathSource.LastIndexOf("\\") + 1, pathSource.Length - pathSource.LastIndexOf("\\") - 1);
