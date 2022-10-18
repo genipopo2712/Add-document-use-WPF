@@ -4,13 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ManualsLib"
+        Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="AviComp VietNam/ Document Control" Height="600" Width="400" Icon="/download.png">
     <Grid Background="LightGray" Width="400" Height="600" Margin="0,0,0,-16">
         <Label Content="Add Document" Width="400" Height="50" FontSize="20" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" Grid.ColumnSpan="2"                             />
         <!--Brandname selector-->
         <Label Margin="10,120,300,450" Width="80" Height="30" Grid.Column="1" Content="Brand name:" />
-        <ComboBox x:Name="brandName"  Margin="125,120,115,450" Width="150" Height="30" Grid.Column="1"/>
+        <ComboBox x:Name="brandName" SelectionChanged="brandName_SelectionChanged"  Margin="125,120,115,450" Width="150" Height="30" Grid.Column="1" />
+        <Label Content="New Brand" HorizontalAlignment="Left" Margin="303,89,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="newBrand"  Margin="297,120,23,450" Width="70" Height="30" Grid.Column="1"/>
         <!--Title selector-->
         <Label Margin="10,160,300,410" Width="80" Height="30" Grid.Column="1"  Content="Title:"  />
@@ -25,10 +27,10 @@
         <Label Margin="10,281,300,289" Width="80" Height="30" Grid.Column="1"  Content="Source:"  />
         <!--path to source file-->
         <TextBox x:Name="desPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="150,288,40,252" Background="LightGray" BorderBrush="LightGray" Grid.Column="1"/>
-        <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="127,290,243,290" Grid.Column="1"/>
+        <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="127,290,243,290" Grid.Column="1" Click="desPdf_Click"/>
         <TextBox x:Name="CheckResult" IsReadOnly="True" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170" Grid.ColumnSpan="2"/>
         <!--Add button-->
-        <Button x:Name="AddDoc" Content="Insert Document"  Width="100" Height="30" Margin="10,467,280,103"  Grid.Column="1"/>
+        <Button x:Name="AddDoc" Content="Insert Document" Click="AddDoc_Click"  Width="100" Height="30" Margin="10,467,280,103"  Grid.Column="1"/>
         <Button x:Name="AddBrand" Content="Insert Brand" Click="AddBrand_Click"  Width="100" Height="30" Margin="140,467,150,103"  Grid.Column="1"/>
         <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="278,447,12,103" Grid.Column="1"/>
         <Button x:Name="refresh" Width="20" Height="20" Margin="18,12,362,568" >
@@ -36,5 +38,6 @@
                 <Image  Source="/refresh.jpg" StretchDirection="Both"/>
             </Button.Content>
         </Button>
+        
     </Grid>
 </Window>
