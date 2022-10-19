@@ -11,7 +11,7 @@
         <Label Content="Add Document" Width="400" Height="50" FontSize="20" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" Grid.ColumnSpan="2"                             />
         <!--Brandname selector-->
         <Label Margin="10,120,300,450" Width="80" Height="30" Grid.Column="1" Content="Brand name:" />
-        <ComboBox x:Name="brandName" SelectionChanged="brandName_SelectionChanged"  Margin="125,120,115,450" Width="150" Height="30" Grid.Column="1" />
+        <ComboBox x:Name="brandName" DropDownClosed="brandName_DropDownClosed"   Margin="125,120,115,450" Width="150" Height="30" Grid.Column="1" />
         <Label Content="New Brand" HorizontalAlignment="Left" Margin="303,89,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="newBrand"  Margin="297,120,23,450" Width="70" Height="30" Grid.Column="1"/>
         <!--Title selector-->

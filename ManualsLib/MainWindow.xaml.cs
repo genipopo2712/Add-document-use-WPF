@@ -34,34 +34,21 @@ namespace ManualsLib
         }
         public string ThongBao = "";
         public string currPath = "";
+        public DriveService service;
+        public string folderId = "";
+        public string brandIds = "";
+        public string templateIds = "";
+        public string parentIds = "";
+        public string indexIds = "";
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            string currpath = Directory.GetCurrentDirectory();
-            currPath = currpath;
-            Directory.Delete(currPath + "\\Temporary", true);
-            if (!File.Exists(currPath + "\\Temporary"))
-            {
-                Directory.CreateDirectory(currPath + "\\Temporary");
-                //get file Brand.txt from drive to local to load Brand name
-                CheckResult.Text = Sub_Get_Id("Brand.txt", "txt");
-                Sub_Download(Sub_Get_Id("Brand.txt", "txt"), "Brand.txt");
-                Sub_Download(Sub_Get_Id("Template.html", "html"), "Template.html");
-                Sub_Download(Sub_Get_Id("Index.html", "html"), "Index.html");
-            }
-
-
-        }
-        private void Sub_Download(string fileId, string outputname)
-        {
-
             string[] Scopes = { DriveService.Scope.Drive };
             string ApplicationName = "ManualsLib";
             UserCredential credential;
             using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
-                string credPath = "token.json";/*System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);*/
-
-                //credPath = System.IO.Path.Combine(credPath, ".credentials/drive-dotnet-quickstart.json");
+                string credPath = "token.json";
 
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
@@ -70,11 +57,54 @@ namespace ManualsLib
                     CancellationToken.None,
                     new FileDataStore(credPath, true)).Result;
             }
-            var service = new DriveService(new BaseClientService.Initializer()
+            service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
+            currPath = Directory.GetCurrentDirectory();
+            parentIds = "1V1JrUEmwBvrEWNyr8IpAXl09Z8VFZdjO";
+            brandIds = Sub_Get_Id(parentIds, "Brand.txt", "txt");
+            templateIds = Sub_Get_Id(parentIds, "Template.html", "html");
+            indexIds = Sub_Get_Id(parentIds, "Index.html", "html");
+            if (Directory.Exists(currPath + "\\Temporary"))
+            {
+                Directory.Delete(currPath + "\\Temporary", true);
+                Directory.CreateDirectory(currPath + "\\Temporary");
+            }
+            else
+            {
+                Directory.CreateDirectory(currPath + "\\Temporary");
+            }
+        }
+        private void Window_UnLoaded(object sender, RoutedEventArgs e)
+        {          
+
+            
+        }
+        private void Sub_Download(string fileId, string outputname)
+        {
+            //string[] Scopes = { DriveService.Scope.Drive };
+            //string ApplicationName = "ManualsLib";
+            //UserCredential credential;
+            //using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            //{
+            //    string credPath = "token.json";/*System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);*/
+
+            //    //credPath = System.IO.Path.Combine(credPath, ".credentials/drive-dotnet-quickstart.json");
+
+            //    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+            //        GoogleClientSecrets.Load(stream).Secrets,
+            //        Scopes,
+            //        "user",
+            //        CancellationToken.None,
+            //        new FileDataStore(credPath, true)).Result;
+            //}
+            //var service = new DriveService(new BaseClientService.Initializer()
+            //{
+            //    HttpClientInitializer = credential,
+            //    ApplicationName = ApplicationName,
+            //});
             var request = service.Files.Get(fileId);
             var streamdownload = new MemoryStream();
             request.MediaDownloader.ProgressChanged += progress =>
@@ -91,7 +121,7 @@ namespace ManualsLib
             request.Download(streamdownload);
         }
 
-        private string Sub_Get_Id(string foldername, string filetype)
+        private string Sub_Get_Id(string parent, string foldername, string filetype)
         {
             string mimetype = "";
             switch (filetype)
@@ -125,76 +155,67 @@ namespace ManualsLib
                     break;
             }
 
-            string folderId = "";
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
-            {
-                string credPath = "token.json";/*System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);*/
+            //string folderId = "";
+            //string[] Scopes = { DriveService.Scope.Drive };
+            //string ApplicationName = "ManualsLib";
+            //UserCredential credential;
+            //using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            //{
+            //    string credPath = "token.json";
 
-                //credPath = System.IO.Path.Combine(credPath, ".credentials/drive-dotnet-quickstart.json");
-
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-            }
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
+            //    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+            //        GoogleClientSecrets.Load(stream).Secrets,
+            //        Scopes,
+            //        "user",
+            //        CancellationToken.None,
+            //        new FileDataStore(credPath, true)).Result;
+            //}
+            //var service = new DriveService(new BaseClientService.Initializer()
+            //{
+            //    HttpClientInitializer = credential,
+            //    ApplicationName = ApplicationName,
+            //});
             FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.Q = $"mimeType ='{mimetype}' and name = '{foldername}' and parents='{Sub_Get_Id("ManualDocument")}' ";
-            try
-            {
-                IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
-            .Files;
+            listRequest.Q = $"mimeType ='{mimetype}' and name = '{foldername}' and parents='{parent}' ";
+            IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
+        .Files;
 
-                if (files.Count > 0)
-                {
-                    folderId = listRequest.Execute().Files[0].Id;
-
-                }
-                else
-                {
-                    folderId = "File not found.";
-                }
-            }
-            catch (Exception ex)
+            if (files.Count > 0)
             {
-                folderId = ex.Message;
+                folderId = listRequest.Execute().Files[0].Id;
+
             }
+            else
+            {
+                folderId = "File not found.";
+            }
+
+
             return folderId;
         }
         private string Sub_Get_Id(string foldername)
         {
 
-            string folderId = "";
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
-            {
-                string credPath = "token.json";/*System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);*/
+            //string folderId = "";
+            //string[] Scopes = { DriveService.Scope.Drive };
+            //string ApplicationName = "ManualsLib";
+            //UserCredential credential;
+            //using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            //{
+            //    string credPath = "token.json";
 
-                //credPath = System.IO.Path.Combine(credPath, ".credentials/drive-dotnet-quickstart.json");
-
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-            }
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
+            //    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+            //        GoogleClientSecrets.Load(stream).Secrets,
+            //        Scopes,
+            //        "user",
+            //        CancellationToken.None,
+            //        new FileDataStore(credPath, true)).Result;
+            //}
+            //var service = new DriveService(new BaseClientService.Initializer()
+            //{
+            //    HttpClientInitializer = credential,
+            //    ApplicationName = ApplicationName,
+            //});
             FilesResource.ListRequest listRequest = service.Files.List();
             listRequest.Q = $"mimeType ='application/vnd.google-apps.folder' and name = '{foldername}' ";
             try
@@ -229,6 +250,9 @@ namespace ManualsLib
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            Sub_Download(brandIds, "Brand.txt");
+            Sub_Download(templateIds, "Template.html");
+            Sub_Download(indexIds, "Index.html");
             EditDocument editDocument = new EditDocument();
             editDocument.Show();
             this.Close();
@@ -236,10 +260,15 @@ namespace ManualsLib
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            //get file Brand.txt from drive to local to load Brand name
+            Sub_Download(brandIds, "Brand.txt");
+            Sub_Download(templateIds, "Template.html");
+            Sub_Download(indexIds, "Index.html");
             AddDocDrive addDocDrive = new AddDocDrive();
             addDocDrive.Show();
             this.Close();
         }
 
+        
     }
 }

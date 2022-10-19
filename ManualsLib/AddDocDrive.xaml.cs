@@ -51,7 +51,7 @@ namespace ManualsLib
 
         private void AddBrand_Click(object sender, RoutedEventArgs e)
         {
-            
+
             string outputBrand = "";
             string kq = "File not found.";
             kq = Sub_Get_Id(newBrand.Text);
@@ -72,7 +72,7 @@ namespace ManualsLib
                 string inputBrand = File.ReadAllText(currPath + "\\Temporary\\" + "Template.html");
                 outputBrand = inputBrand.Replace("brandnameheader", folderName);
                 File.WriteAllText(currPath + "\\Temporary\\" + folderName + ".html", outputBrand);
-                Sub_Upload(currPath + "\\Temporary\\"+folderName+".html",Sub_Get_Id(folderName), folderName+".html", "html");
+                Sub_Upload(currPath + "\\Temporary\\" + folderName + ".html", Sub_Get_Id(folderName), folderName + ".html", "html");
                 string inputIndex = File.ReadAllText(currPath + "\\Temporary\\" + "Brand.txt");
                 string outputIndex = inputIndex + ";" + folderName;
                 File.WriteAllText(currPath + "\\Temporary\\" + "Brand.txt", outputIndex);
@@ -110,9 +110,7 @@ namespace ManualsLib
             UserCredential credential;
             using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
-                string credPath = "token.json";/*System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);*/
-
-                //credPath = System.IO.Path.Combine(credPath, ".credentials/drive-dotnet-quickstart.json");
+                string credPath = "token.json";
 
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
@@ -371,9 +369,9 @@ namespace ManualsLib
         //    }
         //    ThongBao = "Upload completed file: ";
         //}
-        private void Sub_Upload(string pathsource, string destination,string name, string filetype)
+        private void Sub_Upload(string pathsource, string destination, string name, string filetype)
         {
-            var parents = new List<string> { destination }; 
+            var parents = new List<string> { destination };
             string mimetype = "";
             switch (filetype)
             {
@@ -424,8 +422,10 @@ namespace ManualsLib
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
+
             var FileMetaData = new Google.Apis.Drive.v3.Data.File()
             {
+
                 Parents = parents,
                 Name = name
             };
@@ -489,13 +489,14 @@ namespace ManualsLib
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
-            
+
             var request = service.Files.Delete(fileId);
             request.Execute();
         }
-        
+
         private void SubloadTemplate()
         {
+
             string doc = "<!--template add new document-->";
             string tempAddBrand = File.ReadAllText(currPath + "\\Temporary\\Template.html");
             string tempAddDoc = tempAddBrand.Substring(tempAddBrand.IndexOf(doc) + doc.Length + 6, tempAddBrand.LastIndexOf(doc) - tempAddBrand.IndexOf(doc) - doc.Length - 11);
@@ -503,11 +504,11 @@ namespace ManualsLib
         }
         private void Sub_Window_Loaded()
         {
+
             string filename = currPath + "\\Temporary\\Brand.txt";
             string localBrand = File.ReadAllText(filename);
             var arrlocalBrand = localBrand.Split(';');
             brandName.ItemsSource = arrlocalBrand.ToList();
-
             //Load brand name from Brand.txt
             string brandList = "\"About\";";
             foreach (var it in arrlocalBrand)
@@ -681,9 +682,9 @@ namespace ManualsLib
                         File.WriteAllText(filename, outputBrand);
                         var pb = new List<string> { Sub_Get_Id(brandName.SelectedItem.ToString()) };
                         ParentPath = pb;
-                        Sub_Delete_Drive(Sub_Get_Id(brandName.SelectedItem.ToString().Trim()+".html","html"));
+                        Sub_Delete_Drive(Sub_Get_Id(brandName.SelectedItem.ToString().Trim() + ".html", "html"));
 
-                        Sub_Upload(filename, Sub_Get_Id(brandName.SelectedItem.ToString()), brandName.SelectedItem.ToString()+".html", "html");
+                        Sub_Upload(filename, Sub_Get_Id(brandName.SelectedItem.ToString()), brandName.SelectedItem.ToString() + ".html", "html");
                         //open file Index.html => save Brand index to file 
                         ThongBao = $"Added database of model: {Model.Text}";
                     }
@@ -697,14 +698,18 @@ namespace ManualsLib
 
         }
 
-        private void brandName_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void brandName_DropDownClosed(object sender, EventArgs e)
         {
-            string brandname = brandName.SelectedItem.ToString();
-            if (File.Exists(currPath + "\\Temporary\\" + brandname + ".html"))
+            if (brandName.SelectedItem.ToString() != null)
             {
-                File.Delete(currPath + "\\Temporary\\" + brandname + ".html");
+                string brandname = brandName.SelectedItem.ToString();
+                if (File.Exists(currPath + "\\Temporary\\" + brandname + ".html"))
+                {
+                    File.Delete(currPath + "\\Temporary\\" + brandname + ".html");
+                }
+                Sub_Download(Sub_Get_Id(brandname + ".html", "html"), brandname + ".html");
             }
-            Sub_Download(Sub_Get_Id(brandname + ".html", "html"), brandname + ".html");
+           
         }
     }
 }

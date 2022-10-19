@@ -13,14 +13,14 @@
         <Label Content="Replace By" HorizontalAlignment="Left" Margin="437,76,0,0" VerticalAlignment="Top"/>
         <!--Brandname selector-->
         <Label Margin="68,120,452,450" Width="80" Height="30" >Brand name:</Label>
-        <ComboBox x:Name="brandName" SelectionChanged="brandName_SelectionChanged"  Margin="183,120,267,450" Width="150" Height="30"/>
+        <ComboBox x:Name="brandName" DropDownClosed="brandName_DropDownClosed"   Margin="183,120,267,450" Width="150" Height="30"/>
         <!--Title selector-->
         <Label Margin="68,160,452,410" Width="80" Height="30"  >Title:</Label>
         <TextBox x:Name="Title" IsReadOnly="True" Width="150" Height="30" Margin="183,160,267,410"/>
         <TextBox x:Name="newTitle"  Width="150" Height="30" Margin="395,160,55,410"/>
         <!--Model selector-->
         <Label Margin="68,201,452,369" Width="80" Height="30"  >Model:</Label>
-        <ComboBox x:Name="Model" Width="150" Height="30" Margin="183,201,267,369" SelectionChanged="Model_SelectionChanged"/>
+        <ComboBox x:Name="Model" Width="150" Height="30" Margin="183,201,267,369"  DropDownClosed="Model_DropDownClosed"/>
         <TextBox x:Name="newModel" Width="150" Height="30" Margin="395,201,55,369"/>
         <!--Revision selector-->
         <Label Margin="68,240,452,330" Width="80" Height="30"  >Revision:</Label>

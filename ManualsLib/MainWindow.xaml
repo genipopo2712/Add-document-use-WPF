@@ -8,12 +8,13 @@
         Loaded="Window_Loaded"
         Background="DarkGray"
         Title="AviComp VietNam" Height="400" Width="200" Icon="/download.png">
+
     <Grid Width="200" Height="500">
-        <Button Content="Add Document" Width="100" Height="50" Hyperlink.Click="Button_Click" Margin="50,61,50,373"></Button>
-        <Button Content="Delete Document" Width="100" Height="50" Hyperlink.Click="Button_Click_1"  Margin="50,153,50,281"></Button>
-        <Button Content="Add Document Drive" Width="100" Height="50" Hyperlink.Click="Button_Click_2"  Margin="50,251,50,199"/>
-        
-            <TextBox x:Name="CheckResult" Visibility="Hidden"  Text="CheckResult" TextWrapping="Wrap" Width="120" Height="20" Margin="40,340,40,140"/>
-        
+        <Button Content="Add Document" Visibility="Hidden" Width="100" Height="50" Hyperlink.Click="Button_Click" Margin="50,61,50,373"></Button>
+        <Button Content="Edit Document" Width="100" Height="50" Hyperlink.Click="Button_Click_1"  Margin="50,187,50,263"></Button>
+        <Button Content="Add Document" Width="100" Height="50" Hyperlink.Click="Button_Click_2" Margin="50,96,50,354" />
+
+        <TextBox x:Name="CheckResult" Visibility="Hidden"  Text="CheckResult" TextWrapping="Wrap" Width="120" Height="20" Margin="40,340,40,140"/>
+
     </Grid>
 </Window>
