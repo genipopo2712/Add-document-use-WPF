@@ -1,5 +1,5 @@
-﻿<Window x:Class="ManualsLib.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window x:Class="ManualsLib.SubMainWindow"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,7 +15,7 @@
         <Button Content="Add Document" Width="100" Height="50" Hyperlink.Click="Button_Click_2" Margin="50,96,50,354" />
 
         <TextBox x:Name="CheckResult" Visibility="Hidden"  Text="CheckResult" TextWrapping="Wrap" Width="120" Height="20" Margin="40,340,40,140"/>
-        <Label Content="MainWindow" HorizontalAlignment="Left" Height="27" Margin="71,32,0,0" VerticalAlignment="Top" Width="83"/>
+        <Label Content="Main Window" HorizontalAlignment="Left" Height="27" Margin="71,32,0,0" VerticalAlignment="Top" Width="83"/>
 
     </Grid>
 </Window>

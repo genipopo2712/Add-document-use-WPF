@@ -132,9 +132,12 @@ namespace ManualsLib
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.Show();
+            SubMainWindow subMainWindow = new SubMainWindow();
+            subMainWindow.Show();
             this.Close();
+            //SubMainWindow submainWindow = new SubMainWindow();
+            //submainWindow.Show();
+            //this.Close();
         }
 
         private void AddBrand_Click(object sender, RoutedEventArgs e)

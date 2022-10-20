@@ -63,9 +63,12 @@ namespace ManualsLib
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.Show();
+            SubMainWindow subMainWindow = new SubMainWindow();
+            subMainWindow.Show();
             this.Close();
+            //SubMainWindow submainWindow = new SubMainWindow();
+            //submainWindow.Show();
+            //this.Close();
         }
 
         private void Change_Click(object sender, RoutedEventArgs e)
@@ -584,26 +587,36 @@ namespace ManualsLib
 
             string filename = currPath + "\\Temporary\\Brand.txt";
             string localBrand = File.ReadAllText(filename);
-            var arrlocalBrand = localBrand.Split(';');
+            var arrlocalBrand = localBrand.Split(';').ToList();
+            arrlocalBrand.Remove("");
             brandName.ItemsSource = arrlocalBrand.ToList();
+            if (brandName.Items[0] == "")
+            {
+                brandName.IsEnabled = false;
+            }
+            else
+            {
+                brandName.IsEnabled = true;
+            }
             //Load brand name from Brand.txt
-            string brandList = "\"About\";";
+            string brandList = "";
             foreach (var it in arrlocalBrand)
             {
-                brandList = brandList + "\"" + it + "\"" + ",";
+                brandList = brandList + "\"" + it + "\"" + ";";
             }
-            brandList = brandList + "\"Edit\"";
+            brandList = brandList.Substring(0, brandList.Length - 1);
+            //brandList = brandList + "\"Edit\"";
             //Open Index.html =>edit => save
             string Database = currPath + "\\Temporary\\Index.html";
             string index = File.ReadAllText(Database);
-            int startpoint = index.IndexOf("\"About\"");
-            int endpoint = index.IndexOf("\"Edit\"");
+            int startpoint = index.IndexOf("[\"");
+            int endpoint = index.IndexOf("\"]");
             int ttlength = index.Length;
-            string indextemp = index.Remove(startpoint, endpoint - startpoint + 6);
+            string indextemp = index.Remove(startpoint + 1, endpoint - startpoint);
             string parentPath = currPath.Replace("\\", "\\\\");
-            indextemp = indextemp.Insert(startpoint, brandList);
+            indextemp = indextemp.Insert(startpoint + 1, brandList);
             indextemp = indextemp.Remove(indextemp.IndexOf("index1 = ") + 10, indextemp.IndexOf(";//index1") - indextemp.IndexOf("index1 = ") - 11);
-            indextemp = indextemp.Insert(indextemp.IndexOf("index1 = ") + 10, parentPath + "Database");
+            indextemp = indextemp.Insert(indextemp.IndexOf("index1 = ") + 10, parentPath + "\\\\Temporary");
             File.WriteAllText(Database, indextemp);
         }
 

@@ -31,6 +31,39 @@ namespace ManualsLib
         public MainWindow()
         {
             InitializeComponent();
+            using (stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            {
+                string credPath = "token.json";
+
+                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    Scopes,
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore(credPath, true)).Result;
+            }
+            service = new DriveService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
+            currPath = Directory.GetCurrentDirectory();
+            parentIds = "1V1JrUEmwBvrEWNyr8IpAXl09Z8VFZdjO";
+            brandIds = Sub_Get_Id(parentIds, "Brand.txt", "txt");
+            templateIds = Sub_Get_Id(parentIds, "Template.html", "html");
+            indexIds = Sub_Get_Id(parentIds, "Index.html", "html");
+            if (Directory.Exists(currPath + "\\Temporary"))
+            {
+                Directory.Delete(currPath + "\\Temporary", true);
+                Directory.CreateDirectory(currPath + "\\Temporary");
+            }
+            else
+            {
+                Directory.CreateDirectory(currPath + "\\Temporary");
+            }
+            Sub_Download(brandIds, "Brand.txt");
+            Sub_Download(templateIds, "Template.html");
+            Sub_Download(indexIds, "Index.html");
         }
         public string ThongBao = "";
         public string currPath = "";
@@ -40,13 +73,14 @@ namespace ManualsLib
         public string templateIds = "";
         public string parentIds = "";
         public string indexIds = "";
-
+        public FileStream stream;
+        public UserCredential credential;
+        public string[] Scopes = { DriveService.Scope.Drive };
+        public string ApplicationName = "ManualsLib";
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            
+            using (stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
                 string credPath = "token.json";
 
@@ -77,11 +111,7 @@ namespace ManualsLib
                 Directory.CreateDirectory(currPath + "\\Temporary");
             }
         }
-        private void Window_UnLoaded(object sender, RoutedEventArgs e)
-        {          
 
-            
-        }
         private void Sub_Download(string fileId, string outputname)
         {
             //string[] Scopes = { DriveService.Scope.Drive };
@@ -250,9 +280,9 @@ namespace ManualsLib
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Sub_Download(brandIds, "Brand.txt");
-            Sub_Download(templateIds, "Template.html");
-            Sub_Download(indexIds, "Index.html");
+            //Sub_Download(brandIds, "Brand.txt");
+            //Sub_Download(templateIds, "Template.html");
+            //Sub_Download(indexIds, "Index.html");
             EditDocument editDocument = new EditDocument();
             editDocument.Show();
             this.Close();
@@ -261,14 +291,14 @@ namespace ManualsLib
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             //get file Brand.txt from drive to local to load Brand name
-            Sub_Download(brandIds, "Brand.txt");
-            Sub_Download(templateIds, "Template.html");
-            Sub_Download(indexIds, "Index.html");
+            //Sub_Download(brandIds, "Brand.txt");
+            //Sub_Download(templateIds, "Template.html");
+            //Sub_Download(indexIds, "Index.html");
             AddDocDrive addDocDrive = new AddDocDrive();
             addDocDrive.Show();
             this.Close();
         }
 
-        
+       
     }
 }
