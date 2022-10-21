@@ -33,7 +33,7 @@
         <Button x:Name="AddDoc" Content="Insert Document" Click="AddDoc_Click"  Width="100" Height="30" Margin="10,467,280,103"  Grid.Column="1"/>
         <Button x:Name="AddBrand" Content="Insert Brand" Click="AddBrand_Click"  Width="100" Height="30" Margin="140,467,150,103"  Grid.Column="1"/>
         <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="278,447,12,103" Grid.Column="1"/>
-        <Button x:Name="refresh" Width="20" Height="20" Margin="18,12,362,568" >
+        <Button x:Name="refresh" Width="20" Height="20" Margin="18,12,362,568" Click="refresh_Click" >
             <Button.Content>
                 <Image  Source="/refresh.jpg" StretchDirection="Both"/>
             </Button.Content>

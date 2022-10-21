@@ -36,7 +36,10 @@ namespace ManualsLib
         {
             InitializeComponent();
         }
-
+        public string dataId = "";      //id of the folder on the drive, assign when brandName dropdowbox selecedchanged to use for the function delete or change after
+        public string brandID = "";     //id of the brandName.html on the drive, assign when brandName dropdowbox selecedchanged to use for the function delete or change after
+        public string modelId = "";     // id of the pdf file of the model, assign when model dropdowbox selectchanged to use for delete or change function after
+        public string error = "";
         public string pathSource = "";
         public string ThongBao = "";
         public List<string> ParentPath = new List<string>();
@@ -54,9 +57,30 @@ namespace ManualsLib
         public string startpdf = "href=\"";//6
         public string endpdf = "target";
         public string ManualDocumentId = "1V1JrUEmwBvrEWNyr8IpAXl09Z8VFZdjO";
-        public string brandNameSelectedId = "";
+        public FileStream stream;
+
+        public UserCredential credential;
+        public DriveService service;
+        public string ApplicationName = "ManualsLib";
+        public string[] Scopes = { DriveService.Scope.Drive };
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            using (stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            {
+                string credPath = "token.json";
+
+                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    Scopes,
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore(credPath, true)).Result;
+            }
+            service = new DriveService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
             SubloadTemplate();
             Sub_Window_Loaded();
         }
@@ -75,9 +99,11 @@ namespace ManualsLib
         {
             try
             {
-                string namePdf = pathSource.Substring(pathSource.LastIndexOf("\\") + 1, pathSource.Length - pathSource.LastIndexOf("\\") - 1);
+                string newpdfId = "";
+                string pathPdfDrive = desPdfPath.Text;
+                string pdfId = pathPdfDrive.Substring(pathPdfDrive.IndexOf("/file/d/") + 8, pathPdfDrive.LastIndexOf("/view") - pathPdfDrive.IndexOf("/file/d/") - 8);
                 string templateIndexModel = "<!--Add new " + Model.SelectedItem.ToString() + "-->";
-                string filename = currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
+                string filename = currPath + "\\Temporary\\" +  brandName.SelectedItem.ToString() + ".html";
                 string tempBrand = File.ReadAllText(filename);
                 int posModel = tempBrand.IndexOf(templateIndexModel);
                 int lastModel = tempBrand.LastIndexOf(templateIndexModel);
@@ -86,39 +112,54 @@ namespace ManualsLib
                 string curTitle = Title.Text;
                 string nTitle = newTitle.Text;
                 //edit Title
-                if (newTitle.Text != null)
+                if (!string.IsNullOrEmpty(newTitle.Text))
                 {
                     outputBrand = outputBrand.Replace(curTitle, nTitle);
                 }
                 //edit Revision
-                if (newRevision.Text != null)
+                if (!string.IsNullOrEmpty(newRevision.Text))
                 {
-                    outputBrand = outputBrand.Replace(Revision.Text, newRevision.Text);
+                    if (string.IsNullOrEmpty(Revision.Text))
+                    {
+                        outputBrand = outputBrand.Replace("<!--outputRevision-->", newRevision.Text);
+                    }
+                    else
+                    {
+                        outputBrand = outputBrand.Replace(Revision.Text, newRevision.Text);
+                    }
+                    
                 }
                 //edit Pdf file
-                if (newdesPdfPath.Text != "")
+                if (!string.IsNullOrEmpty(newdesPdfPath.Text))
                 {
-                    File.Delete(currPath + "Database\\" + pdfname);
-                    File.Copy(pathSource, currPath + "Database\\" + namePdf);
-                    outputBrand = outputBrand.Replace(desPdfPath.Text.Substring(desPdfPath.Text.LastIndexOf("\\") + 1, desPdfPath.Text.Length - desPdfPath.Text.LastIndexOf("\\") - 1), newdesPdfPath.Text.Substring(newdesPdfPath.Text.LastIndexOf("\\") + 1, newdesPdfPath.Text.Length - newdesPdfPath.Text.LastIndexOf("\\") - 1));
+                    string newdesPdfname = newdesPdfPath.Text;
+                    newdesPdfname = newdesPdfname.Substring(newdesPdfname.LastIndexOf("\\")+1);
+                    Sub_Delete_Drive(pdfId);
+                    Sub_Upload(newdesPdfPath.Text, dataId, newdesPdfname, "pdf");
+                    newpdfId=Sub_Get_Id(newdesPdfname, "pdf");
+                    outputBrand = outputBrand.Replace(pdfId, newpdfId);
                 }
 
-                if (newModel.Text != null)
+                if (!string.IsNullOrEmpty(newModel.Text))
                 {
-
+                    string newmodel = newModel.Text;
+                    outputBrand = outputBrand.Replace(Model.SelectedItem.ToString(), newmodel);
                 }
 
                 File.WriteAllText(filename, outputBrand);
                 Title.Text = outputBrand.Substring(outputBrand.IndexOf(startTitle, posModel) + 9, outputBrand.IndexOf(endTitle, posModel) - outputBrand.IndexOf(startTitle, posModel) - 9).Trim();
                 Revision.Text = outputBrand.Substring(outputBrand.LastIndexOf(startRev, lastModel, lastModel - posModel - 1) + 6, outputBrand.LastIndexOf(endRev, lastModel, lastModel - posModel - 1) - outputBrand.LastIndexOf(startRev, lastModel, lastModel - posModel - 1) - 6).Trim();
-                desPdfPath.Text = currPath + "Database\\" + outputBrand.Substring(outputBrand.IndexOf(startpdf, posModel) + 6, outputBrand.IndexOf(endpdf, posModel) - outputBrand.IndexOf("href=\"", posModel) - 8);
+                string newdesPdf = "https://drive.google.com/file/d/pdfIdspath/view?usp=sharing";
+                desPdfPath.Text = newdesPdf.Replace("pdfIdspath", newpdfId);
+                Sub_Delete_Drive(brandID);
+                Sub_Upload(filename, dataId, brandName.SelectedItem.ToString() + ".html", "html");
             }
             catch (Exception ex)
             {
                 CheckResult.Text = ex.Message;
             }
             Sub_Window_Loaded();
-
+           
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
@@ -127,15 +168,23 @@ namespace ManualsLib
             //{
             //search table data of Model selected in brandName.html and delete all code, search pdf name and delete in folder as well, delete index of Model in <!--IndexModel in brandName.html
             string templateIndexModel = "<!--Add new " + Model.SelectedItem.ToString() + "-->";
-            string filename = currPath + "Database\\" + brandName.SelectedItem.ToString() + "\\" + brandName.SelectedItem.ToString() + ".html";
+            string filename = currPath + "\\Temporary\\" +  brandName.SelectedItem.ToString() + ".html";
             string tempBrand = File.ReadAllText(filename);
             int posModel = tempBrand.IndexOf(templateIndexModel);
             string pdfname = tempBrand.Substring(tempBrand.IndexOf(startpdf, posModel) + 6, tempBrand.IndexOf(endpdf, posModel) - tempBrand.IndexOf("href=\"", posModel) - 8);
-            File.Delete(currPath + "Database\\" + pdfname);
+            string pdfId= pdfname.Substring(pdfname.IndexOf("/file/d/") + 8, pdfname.LastIndexOf("/view") - pdfname.IndexOf("/file/d/") - 8);
             outputBrand = tempBrand.Remove(posModel, tempBrand.LastIndexOf(templateIndexModel) - posModel + templateIndexModel.Length);
             outputBrand = outputBrand.Replace(Model.SelectedItem.ToString() + ";", "");
             File.WriteAllText(filename, outputBrand);
+            if (CheckResult.Text != $"Document don't exist in path {pdfname}")
+            {
+                Sub_Delete_Drive(modelId);
+            }
+            Sub_Delete_Drive(brandID);
+            Sub_Upload(filename, dataId, brandName.SelectedItem.ToString()+".html","html");            
             CheckResult.Text = $"Deleted database of {Model.SelectedItem.ToString()}";
+
+            Sub_Window_Loaded();
             //}
             //catch(Exception ex)
             //{
@@ -160,12 +209,23 @@ namespace ManualsLib
 
         private void DeleteBrand_Click(object sender, RoutedEventArgs e)
         {
-            Sub_Delete_Drive(brandNameSelectedId);
-            string inputBrand = File.ReadAllText(currPath + "\\Temporary\\Brand.txt");
-            outputBrand = inputBrand.Replace(";" + brandName.SelectedItem.ToString(), "");
-            File.WriteAllText(currPath + "\\Temporary\\Brand.txt", outputBrand);
-            Sub_Delete_Drive(Sub_Get_Id("Brand.txt", "txt"));
-            Sub_Upload(currPath + "\\Temporary\\Brand.txt", ManualDocumentId, "Brand.txt", "txt");
+            if (brandName.SelectedIndex != -1)
+            {
+                Sub_Delete_Drive(Sub_Get_Id(brandName.SelectedItem.ToString()));
+                string inputBrand = File.ReadAllText(currPath + "\\Temporary\\Brand.txt");
+                outputBrand = inputBrand.Replace(";" + brandName.SelectedItem.ToString(), "");
+                File.WriteAllText(currPath + "\\Temporary\\Brand.txt", outputBrand);
+                Sub_Delete_Drive(Sub_Get_Id("Brand.txt", "txt"));
+                File.Delete(currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + ".html");
+                Sub_Upload(currPath + "\\Temporary\\Brand.txt", ManualDocumentId, "Brand.txt", "txt");
+                ThongBao = "Deleted " + brandName.SelectedItem.ToString();
+                Sub_Window_Loaded();
+            }
+            else
+            {
+                ThongBao = "Please select Brand.";
+            }
+            CheckResult.Text = ThongBao;
         }
 
         private void Refresh_Click(object sender, RoutedEventArgs e)
@@ -290,106 +350,12 @@ namespace ManualsLib
         //    string folderId = listRequest.Execute().Files[0].Id;
         //    return folderId;
         //} not use replace by Sub_Get_Id(string foldername, string filetype) and Sub_Get_Id(string foldername)
-        private string Sub_Get_Id(string foldername, string filetype)
-        {
-            string mimetype = "";
-            switch (filetype)
-            {
-                case "html":
-                    mimetype = "text/html";
-                    break;
-                case "txt":
-                    mimetype = "text/plain";
-                    break;
-                case "pdf":
-                    mimetype = "application/pdf";
-                    break;
-                case "doc":
-                    mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                    break;
-                case "docx":
-                    mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                    break;
-                case "xlsx":
-                    mimetype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    break;
-                case "xlsm":
-                    mimetype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheetl";
-                    break;
-                case "jpeg":
-                    mimetype = "image/jpeg";
-                    break;
-                case "png":
-                    mimetype = "image/png";
-                    break;
-            }
 
-            string folderId = "";
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
-            {
-                string credPath = "token.json";
-
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-            }
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
-            FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.Q = $"mimeType ='{mimetype}' and name = '{foldername}' ";
-            try
-            {
-                IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
-            .Files;
-
-                if (files.Count > 0)
-                {
-                    folderId = listRequest.Execute().Files[0].Id;
-
-                }
-                else
-                {
-                    folderId = "File not found.";
-                }
-            }
-            catch (Exception ex)
-            {
-                folderId = ex.Message;
-            }
-            return folderId;
-        }
         private string Sub_Get_Id(string foldername)
         {
 
             string folderId = "";
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
-            {
-                string credPath = "token.json";
 
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-            }
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
             FilesResource.ListRequest listRequest = service.Files.List();
             listRequest.Q = $"mimeType ='application/vnd.google-apps.folder' and name = '{foldername}' ";
             try
@@ -413,6 +379,7 @@ namespace ManualsLib
             }
             return folderId;
         }
+
         //private void Sub_Upload(string name)
         //{
         //    string[] Scopes = { DriveService.Scope.Drive };
@@ -483,25 +450,6 @@ namespace ManualsLib
                     mimetype = "image/png";
                     break;
             }
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
-            {
-                string credPath = "token.json";
-
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-            }
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
 
             var FileMetaData = new Google.Apis.Drive.v3.Data.File()
             {
@@ -518,62 +466,127 @@ namespace ManualsLib
             }
             ThongBao = "Upload completed file: ";
         }
-        private void Sub_Read(string foldername)
+        private string Sub_Read(string fileId)
         {
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            string folderId = "";
+
+            try
             {
-                string credPath = "token.json";/*System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);*/
-
-                //credPath = System.IO.Path.Combine(credPath, ".credentials/drive-dotnet-quickstart.json");
-
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
+                var request = service.Files.Get(fileId).Execute();
+                var name = request.MimeType;
+                folderId = name;
             }
-            var service = new DriveService(new BaseClientService.Initializer()
+            catch (Exception)
             {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
-            FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.Q = $"'text/html' and name = '{foldername}' and parents = '1V1JrUEmwBvrEWNyr8IpAXl09Z8VFZdjO'";
+                folderId = "File not found.";
+            }
 
-            IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
-            .Files;
+
+            return folderId;
 
         }
         private void Sub_Delete_Drive(string fileId)
         {
-            string[] Scopes = { DriveService.Scope.Drive };
-            string ApplicationName = "ManualsLib";
-            UserCredential credential;
-            using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
-            {
-                string credPath = "token.json";
+            //string[] Scopes = { DriveService.Scope.Drive };
+            //string ApplicationName = "ManualsLib";
+            //UserCredential credential;
+            //using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            //{
+            //    string credPath = "token.json";
 
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-            }
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
+            //    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+            //        GoogleClientSecrets.Load(stream).Secrets,
+            //        Scopes,
+            //        "user",
+            //        CancellationToken.None,
+            //        new FileDataStore(credPath, true)).Result;
+            //}
+            //var service = new DriveService(new BaseClientService.Initializer()
+            //{
+            //    HttpClientInitializer = credential,
+            //    ApplicationName = ApplicationName,
+            //});
 
             var request = service.Files.Delete(fileId);
             request.Execute();
         }
+        private string Sub_Get_Id(string foldername, string filetype)
+        {
+            string mimetype = "";
+            switch (filetype)
+            {
+                case "html":
+                    mimetype = "text/html";
+                    break;
+                case "txt":
+                    mimetype = "text/plain";
+                    break;
+                case "pdf":
+                    mimetype = "application/pdf";
+                    break;
+                case "doc":
+                    mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    break;
+                case "docx":
+                    mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    break;
+                case "xlsx":
+                    mimetype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    break;
+                case "xlsm":
+                    mimetype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheetl";
+                    break;
+                case "jpeg":
+                    mimetype = "image/jpeg";
+                    break;
+                case "png":
+                    mimetype = "image/png";
+                    break;
+            }
 
+            string folderId = "";
+            //string[] Scopes = { DriveService.Scope.Drive };
+            //string ApplicationName = "ManualsLib";
+            //UserCredential credential;
+            //using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            //{
+            //    string credPath = "token.json";
+
+            //    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+            //        GoogleClientSecrets.Load(stream).Secrets,
+            //        Scopes,
+            //        "user",
+            //        CancellationToken.None,
+            //        new FileDataStore(credPath, true)).Result;
+            //}
+            //var service = new DriveService(new BaseClientService.Initializer()
+            //{
+            //    HttpClientInitializer = credential,
+            //    ApplicationName = ApplicationName,
+            //});
+            FilesResource.ListRequest listRequest = service.Files.List();
+            listRequest.Q = $"mimeType ='{mimetype}' and name = '{foldername}' ";
+            try
+            {
+                IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
+            .Files;
+
+                if (files.Count > 0)
+                {
+                    folderId = listRequest.Execute().Files[0].Id;
+
+                }
+                else
+                {
+                    folderId = "File not found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                folderId = ex.Message;
+            }
+            return folderId;
+        }
         private void SubloadTemplate()
         {
 
@@ -584,40 +597,46 @@ namespace ManualsLib
         }
         private void Sub_Window_Loaded()
         {
-
+            string brandList = "";
             string filename = currPath + "\\Temporary\\Brand.txt";
             string localBrand = File.ReadAllText(filename);
             var arrlocalBrand = localBrand.Split(';').ToList();
             arrlocalBrand.Remove("");
             brandName.ItemsSource = arrlocalBrand.ToList();
-            if (brandName.Items[0] == "")
+            if (string.IsNullOrEmpty(localBrand))
             {
                 brandName.IsEnabled = false;
             }
             else
             {
                 brandName.IsEnabled = true;
+                foreach (var it in arrlocalBrand)
+                {
+                    brandList = brandList + "\"" + it + "\"" + ",";
+                }
+                brandList = brandList.Substring(0, brandList.Length - 1);
             }
             //Load brand name from Brand.txt
-            string brandList = "";
-            foreach (var it in arrlocalBrand)
-            {
-                brandList = brandList + "\"" + it + "\"" + ";";
-            }
-            brandList = brandList.Substring(0, brandList.Length - 1);
             //brandList = brandList + "\"Edit\"";
             //Open Index.html =>edit => save
             string Database = currPath + "\\Temporary\\Index.html";
             string index = File.ReadAllText(Database);
             int startpoint = index.IndexOf("[\"");
             int endpoint = index.IndexOf("\"]");
-            int ttlength = index.Length;
             string indextemp = index.Remove(startpoint + 1, endpoint - startpoint);
             string parentPath = currPath.Replace("\\", "\\\\");
             indextemp = indextemp.Insert(startpoint + 1, brandList);
             indextemp = indextemp.Remove(indextemp.IndexOf("index1 = ") + 10, indextemp.IndexOf(";//index1") - indextemp.IndexOf("index1 = ") - 11);
             indextemp = indextemp.Insert(indextemp.IndexOf("index1 = ") + 10, parentPath + "\\\\Temporary");
             File.WriteAllText(Database, indextemp);
+            if (brandName.SelectedIndex == -1)
+            {
+                Model.IsEnabled = false;
+            }
+            else
+            {
+                Model.IsEnabled = true;
+            }
         }
 
         private string Sub_String_To_String(string a)//input string output string without special character
@@ -683,71 +702,92 @@ namespace ManualsLib
                     CancellationToken.None,
                     new FileDataStore(credPath, true)).Result;
             }
-            var service = new DriveService(new BaseClientService.Initializer()
+            try
             {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
-            var request = service.Files.Get(fileId);
-            var streamdownload = new MemoryStream();
-            request.MediaDownloader.ProgressChanged += progress =>
-            {
-                if (progress.Status == DownloadStatus.Completed)
+                var service = new DriveService(new BaseClientService.Initializer()
                 {
-                    using (FileStream fs = new FileStream(currPath + "\\Temporary\\" + outputname, FileMode.Create))
+                    HttpClientInitializer = credential,
+                    ApplicationName = ApplicationName,
+                });
+                var request = service.Files.Get(fileId);
+                var streamdownload = new MemoryStream();
+                request.MediaDownloader.ProgressChanged += progress =>
+                {
+                    if (progress.Status == DownloadStatus.Completed)
                     {
-                        streamdownload.WriteTo(fs);
-                        fs.Flush();
+                        using (FileStream fs = new FileStream(currPath + "\\Temporary\\" + outputname, FileMode.Create))
+                        {
+                            streamdownload.WriteTo(fs);
+                            fs.Flush();
+                        }
                     }
-                }
-            };
-            request.Download(streamdownload);
+                };
+                request.Download(streamdownload);
+            }
+            catch (Exception)
+            {
+                error = "File not found.";
+            }
+
         }
 
         private void brandName_DropDownClosed(object sender, EventArgs e)
         {
-            if (brandName.SelectedItem.ToString() != null)
+            string brandname = "";
+            if (brandName.SelectedIndex != -1)
             {
-                brandName.IsEnabled = false;
-                string brandname = brandName.SelectedItem.ToString();
-                if (File.Exists(currPath + "\\Temporary\\" + brandname + ".html"))
+                Model.IsEnabled = true;
+                brandname = brandName.SelectedItem.ToString();
+                if (!File.Exists(currPath + "\\Temporary\\" + brandname + ".html"))
                 {
-                    File.Delete(currPath + "\\Temporary\\" + brandname + ".html");
+                    
+                    //File.Delete(currPath + "\\Temporary\\" + brandname + ".html");
+                    Sub_Download(brandID, brandname + ".html");
                 }
-                Sub_Download(Sub_Get_Id(brandname + ".html", "html"), brandname + ".html");
+                dataId = Sub_Get_Id(brandname);
+                brandID = Sub_Get_Id(brandname + ".html", "html");
             }
-            
+            else
+            {
+                Model.IsEnabled = false;
+            }
             var dir = new DirectoryInfo(currPath + "\\Temporary");
             dir.Refresh();
-            while (brandName.IsEnabled== false)
+            if(brandName.SelectedIndex !=-1)
             {
-                if (File.Exists(currPath+"\\Temporary\\"+brandName.SelectedItem.ToString()+".html"))
+                if (File.Exists(currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + ".html"))
                 {
-                    brandName.IsEnabled = true;
+                    string filename = currPath + "\\Temporary\\" + brandName.SelectedItem + ".html";
+                    string tempBrand = File.ReadAllText(filename);
+                    string IndexModel = tempBrand.Substring(tempBrand.IndexOf("<!--IndexModel") + 14, tempBrand.LastIndexOf("IndexModel-->") - tempBrand.IndexOf("<!--IndexModel") - 14);
+                    var arrIndexModel = IndexModel.Trim().Split(";");
+                    arrIndexModel = arrIndexModel.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                    for (int i = 0; i < arrIndexModel.Length; i++)
+                    {
+                        arrIndexModel[i] = arrIndexModel[i].Trim();
+                    }
+                    Model.ItemsSource = arrIndexModel.ToList();
+                    
                 }
             }
             
+            CheckResult.Text = ThongBao;
         }
 
         private void Model_DropDownClosed(object sender, EventArgs e)
         {
-            if (brandName.SelectedItem != null)
+            string filename = currPath + "\\Temporary\\" + brandName.SelectedItem + ".html";
+            string tempBrand = File.ReadAllText(filename);
+            string IndexModel = tempBrand.Substring(tempBrand.IndexOf("<!--IndexModel") + 14, tempBrand.LastIndexOf("IndexModel-->") - tempBrand.IndexOf("<!--IndexModel") - 14);
+            var arrIndexModel = IndexModel.Trim().Split(";");
+            arrIndexModel = arrIndexModel.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            for (int i = 0; i < arrIndexModel.Length; i++)
             {
-                string filename = currPath + "\\Temporary\\" +brandName.SelectedItem + ".html";
-                string tempBrand = File.ReadAllText(filename);
-                string IndexModel = tempBrand.Substring(tempBrand.IndexOf("<!--IndexModel") + 14, tempBrand.LastIndexOf("IndexModel-->") - tempBrand.IndexOf("<!--IndexModel") - 14);
-                var arrIndexModel = IndexModel.Trim().Split(";");
-                arrIndexModel = arrIndexModel.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                for (int i = 0; i < arrIndexModel.Length; i++)
-                {
-                    arrIndexModel[i] = arrIndexModel[i].Trim();
-                }
-                Model.ItemsSource = arrIndexModel.ToList();
+                arrIndexModel[i] = arrIndexModel[i].Trim();
             }
-            if (Model.SelectedItem != null)
-            {
-                string filename = currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + ".html";
-                string tempBrand = File.ReadAllText(filename);
+            Model.ItemsSource = arrIndexModel.ToList();
+            if (Model.SelectedIndex != -1)
+            {   
                 string templateIndexModel = "<!--Add new " + Model.SelectedItem.ToString() + "-->";
                 int posModel = tempBrand.IndexOf(templateIndexModel);
                 int lastModel = tempBrand.LastIndexOf(templateIndexModel);
@@ -755,16 +795,22 @@ namespace ManualsLib
                 Title.Text = oldTitle;
                 string oldModel = tempBrand.Substring(tempBrand.IndexOf(startMod, posModel) + 6, tempBrand.IndexOf(endMod, posModel) - tempBrand.IndexOf(startMod, posModel) - 6);
                 string oldRev = tempBrand.Substring(tempBrand.LastIndexOf(startRev, lastModel, lastModel - posModel - 1) + 6, tempBrand.LastIndexOf(endRev, lastModel, lastModel - posModel - 1) - tempBrand.LastIndexOf(startRev, lastModel, lastModel - posModel - 1) - 6).Trim();
+                if(oldRev== "<!--outputRevision-->")
+                {
+                    oldRev = "";
+                }
                 Revision.Text = oldRev;
                 string pdfname = tempBrand.Substring(tempBrand.IndexOf(startpdf, posModel) + 6, tempBrand.IndexOf(endpdf, posModel) - tempBrand.IndexOf("href=\"", posModel) - 8);
-                desPdfPath.Text = currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + "\\" + pdfname;
-                string patha = currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + "\\" + pdfname;
-                if (!File.Exists(patha))
+                desPdfPath.Text = pdfname;
+                string pathPdfDrive = pdfname.Substring(pdfname.IndexOf("/file/d/") + 8, pdfname.LastIndexOf("/view") - pdfname.IndexOf("/file/d/") - 8);
+                ThongBao = pathPdfDrive;
+
+                if (Sub_Read(pathPdfDrive) != "application/pdf")
                 {
-                    ThongBao = $"Document don't exist in path {currPath}\\Temporary\\{brandName.SelectedItem.ToString()}";
+                    ThongBao = $"Document don't exist in path {pdfname}";
                 }
                 CheckResult.Text = ThongBao;
-                
+                modelId = pathPdfDrive;
             }
         }
     }

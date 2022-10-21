@@ -83,7 +83,7 @@ namespace ManualsLib
                 File.WriteAllText(currPath + "\\Temporary\\" + folderName + ".html", outputBrand);
                 Sub_Upload(currPath + "\\Temporary\\" + folderName + ".html", Sub_Get_Id(folderName), folderName + ".html", "html");
                 string inputIndex = File.ReadAllText(currPath + "\\Temporary\\" + "Brand.txt");
-                string outputIndex = inputIndex + folderName+";";
+                string outputIndex = inputIndex + folderName + ";";
                 File.WriteAllText(currPath + "\\Temporary\\" + "Brand.txt", outputIndex);
                 Sub_Delete_Drive(Sub_Get_Id("Brand.txt", "txt"));
                 Sub_Upload(currPath + "\\Temporary\\" + "Brand.txt", "1V1JrUEmwBvrEWNyr8IpAXl09Z8VFZdjO", "Brand.txt", "txt");
@@ -92,7 +92,7 @@ namespace ManualsLib
                 {
                     Sub_Window_Loaded();
                 } while (!File.Exists(currPath + "\\Temporary\\" + "Brand.txt"));
-                
+
             }
             CheckResult.Text = ThongBao;
         }
@@ -113,7 +113,7 @@ namespace ManualsLib
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            using ( stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+            using (stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
             {
                 string credPath = "token.json";
 
@@ -533,37 +533,35 @@ namespace ManualsLib
         }
         private void Sub_Window_Loaded()
         {
-
+            string brandList = "";
             string filename = currPath + "\\Temporary\\Brand.txt";
             string localBrand = File.ReadAllText(filename);
             var arrlocalBrand = localBrand.Split(';').ToList();
             arrlocalBrand.Remove("");
             brandName.ItemsSource = arrlocalBrand.ToList();
-            if (brandName.Items[0] == "" )
+            if (string.IsNullOrEmpty(localBrand))
             {
                 brandName.IsEnabled = false;
             }
             else
             {
                 brandName.IsEnabled = true;
+                foreach (var it in arrlocalBrand)
+                {
+                    brandList = brandList + "\"" + it + "\"" + ",";
+                }
+                brandList = brandList.Substring(0, brandList.Length - 1);
             }
             //Load brand name from Brand.txt
-            string brandList = "";
-            foreach (var it in arrlocalBrand)
-            {
-                brandList = brandList + "\"" + it + "\"" + ";";
-            }
-            brandList = brandList.Substring(0, brandList.Length - 1);
             //brandList = brandList + "\"Edit\"";
             //Open Index.html =>edit => save
             string Database = currPath + "\\Temporary\\Index.html";
             string index = File.ReadAllText(Database);
             int startpoint = index.IndexOf("[\"");
             int endpoint = index.IndexOf("\"]");
-            int ttlength = index.Length;
-            string indextemp = index.Remove(startpoint+1, endpoint - startpoint);
+            string indextemp = index.Remove(startpoint + 1, endpoint - startpoint);
             string parentPath = currPath.Replace("\\", "\\\\");
-            indextemp = indextemp.Insert(startpoint+1, brandList);
+            indextemp = indextemp.Insert(startpoint + 1, brandList);
             indextemp = indextemp.Remove(indextemp.IndexOf("index1 = ") + 10, indextemp.IndexOf(";//index1") - indextemp.IndexOf("index1 = ") - 11);
             indextemp = indextemp.Insert(indextemp.IndexOf("index1 = ") + 10, parentPath + "\\\\Temporary");
             File.WriteAllText(Database, indextemp);
@@ -687,11 +685,6 @@ namespace ManualsLib
             }
             else
             {
-                if (!string.IsNullOrEmpty(desPdfPath.Text))
-                {
-                    Sub_Upload(pathSource, Sub_Get_Id(brandName.SelectedItem.ToString()), namePdf, "pdf");
-                    
-                }
                 string tb = "";
                 filename = currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + ".html";
                 inputBrand = File.ReadAllText(filename);
@@ -710,11 +703,24 @@ namespace ManualsLib
                 {
                     try
                     {
-                        drivePdfpath=drivePdfpath.Replace("pdfIdspath", Sub_Get_Id(namePdf, "pdf"));
+                        if (!string.IsNullOrEmpty(desPdfPath.Text))
+                        {
+                            Sub_Upload(pathSource, Sub_Get_Id(brandName.SelectedItem.ToString()), namePdf, "pdf");
+                        }
+                        drivePdfpath = drivePdfpath.Replace("pdfIdspath", Sub_Get_Id(namePdf, "pdf"));
                         templateBrand = templateBrand.Replace("outputpdfPath", drivePdfpath);//outputpdfPath in template 
                         templateBrand = templateBrand.Replace("outputTitle", Title.Text);//outputTitle
                         templateBrand = templateBrand.Replace("outputModel", Model.Text);//outputModel
-                        templateBrand = templateBrand.Replace("outputRevision", Revision.Text);//outputRevision
+                        string revision = "";
+                        if (string.IsNullOrEmpty(Revision.Text))
+                        {
+                            revision = "<!--outputRevision-->";
+                        }
+                        else
+                        {
+                            revision = Revision.Text;
+                        }
+                        templateBrand = templateBrand.Replace("outputRevision", revision);//outputRevision
                                                                                                //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
                         filename = currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + ".html";
                         inputBrand = File.ReadAllText(filename);
@@ -741,8 +747,7 @@ namespace ManualsLib
         }
         private void brandName_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var brandSelect = brandName.SelectedItem.ToString();
-            if (brandSelect != null)
+            if (brandName.SelectedIndex != -1)
             {
                 string brandname = brandName.SelectedItem.ToString();
                 if (!File.Exists(currPath + "\\Temporary\\" + brandname + ".html"))
@@ -751,13 +756,25 @@ namespace ManualsLib
                     Sub_Download(Sub_Get_Id(brandname + ".html", "html"), brandname + ".html");
                     var dir = new DirectoryInfo(currPath + "\\Temporary");
                     dir.Refresh();
-                }                
+                }
             }
             else
             {
                 ThongBao = "Choose Brand.";
             }
             CheckResult.Text = ThongBao;
+        }
+
+        private void refresh_Click(object sender, RoutedEventArgs e)
+        {
+            Title.Text = "";
+            Model.Text = "";
+            Revision.Text = "";
+            desPdfPath.Text = "";
+            newBrand.Text = "";
+            CheckResult.Text = "";
+            brandName.SelectedIndex = -1;
+            Sub_Window_Loaded();
         }
     }
 }

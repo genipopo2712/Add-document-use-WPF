@@ -260,7 +260,6 @@ namespace ManualsLib
             AddDocument addDocument = new AddDocument();
             addDocument.Show();
             this.Close();
-
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
