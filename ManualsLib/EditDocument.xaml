@@ -8,42 +8,42 @@
         Loaded="Window_Loaded"
         Title="AviComp VietNam/ Document Control" Height="600" Width="600" Icon="/download.png">
     <Grid Background="LightGray" Width="600" Height="600" Margin="0,0,0,-16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Label Content="Edit Document" Width="600" Height="50" FontSize="20" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" Margin="48,0,0,0"/>
-        <Label Content="Curent" HorizontalAlignment="Left" Margin="241,76,0,0" VerticalAlignment="Top"/>
-        <Label Content="Replace By" HorizontalAlignment="Left" Margin="437,76,0,0" VerticalAlignment="Top"/>
+        <Label Content="Edit Document" Width="600" Height="50" FontSize="20" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
+        <Label Content="Curent" HorizontalAlignment="Left" Margin="210,51,0,0" VerticalAlignment="Top"/>
+        <Label Content="Replace By" HorizontalAlignment="Left" Margin="406,49,0,0" VerticalAlignment="Top"/>
         <!--Brandname selector-->
-        <Label Margin="68,120,452,450" Width="80" Height="30" >Brand name:</Label>
-        <ComboBox x:Name="brandName" DropDownClosed="brandName_DropDownClosed"   Margin="183,120,267,450" Width="150" Height="30"/>
+        <Label Margin="37,95,483,475" Width="80" Height="30" >Brand name:</Label>
+        <ComboBox x:Name="brandName" DropDownClosed="brandName_DropDownClosed"   Margin="152,95,298,475" Width="150" Height="30"/>
         <!--Title selector-->
-        <Label Margin="68,160,452,410" Width="80" Height="30"  >Title:</Label>
-        <TextBox x:Name="Title" IsReadOnly="True" Width="150" Height="30" Margin="183,160,267,410"/>
-        <TextBox x:Name="newTitle"  Width="150" Height="30" Margin="395,160,55,410"/>
+        <Label Margin="37,135,483,435" Width="80" Height="30"  >Title:</Label>
+        <TextBox x:Name="Title" IsReadOnly="True" TextWrapping="Wrap" Width="150" Height="60" Margin="152,139,298,401"/>
+        <TextBox x:Name="newTitle" TextWrapping="Wrap"  Width="150" Height="60" Margin="364,139,86,401"/>
         <!--Model selector-->
-        <Label Margin="68,201,452,369" Width="80" Height="30"  >Model:</Label>
-        <ComboBox x:Name="Model" Width="150" Height="30" Margin="183,201,267,369"  DropDownClosed="Model_DropDownClosed"/>
-        <TextBox x:Name="newModel" Width="150" Height="30" Margin="395,201,55,369"/>
+        <Label Margin="37,212,483,358" Width="80" Height="30"  >Model:</Label>
+        <ComboBox x:Name="Model" Width="150" Height="30" Margin="152,212,298,358"  DropDownClosed="Model_DropDownClosed"/>
+        <TextBox x:Name="newModel" Width="150" Height="30" Margin="364,212,86,358"/>
         <!--Revision selector-->
-        <Label Margin="68,240,452,330" Width="80" Height="30"  >Revision:</Label>
-        <TextBox x:Name="Revision" IsReadOnly="True" TextWrapping="Wrap" Width="150" Height="30" Margin="183,240,267,330"/>
-        <TextBox x:Name="newRevision"  TextWrapping="Wrap" Width="150" Height="30" Margin="395,240,55,330"/>
+        <Label Margin="37,251,483,319" Width="80" Height="30"  >Revision:</Label>
+        <TextBox x:Name="Revision" IsReadOnly="True" TextWrapping="Wrap" Width="150" Height="30" Margin="152,251,298,319"/>
+        <TextBox x:Name="newRevision"  TextWrapping="Wrap" Width="150" Height="30" Margin="364,251,86,319"/>
         <!--Source file pdf selector-->
-        <Label Margin="68,281,452,289" Width="80" Height="30"  >Source:</Label>
+        <Label Margin="37,292,483,278" Width="80" Height="30"  >Source:</Label>
         <!--path to source file-->
-        <TextBox x:Name="desPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="128,288,272,252" Background="LightGray" BorderBrush="LightGray"/>
-        <TextBox x:Name="newdesPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="386,288,14,252" Background="LightGray" BorderBrush="LightGray"/>        
-        <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="359,290,221,290" Click="desPdf_Click"/>
+        <TextBox x:Name="desPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="100,299,300,241" Background="LightGray" BorderBrush="LightGray"/>
+        <TextBox x:Name="newdesPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="355,299,45,241" Background="LightGray" BorderBrush="LightGray"/>
+        <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="328,301,252,279" Click="desPdf_Click"/>
         <!--Notice Result-->
-        <TextBox x:Name="CheckResult" IsReadOnly="True" Text="nothing" TextWrapping="Wrap" Width="400" Height="60" Margin="48,370,152,170"/>
+        <TextBox x:Name="CheckResult" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Text="nothing" TextWrapping="Wrap" Height="60" Margin="45,370,54,170"/>
         <!--Delete button-->
-        <Button x:Name="Delete" Content="Delete"  Width="50" Height="25" Margin="133,467,417,108" Click="Delete_Click"/>
+        <Button x:Name="Delete" Content="Delete"  Width="50" Height="25" Margin="104,467,446,108" Click="Delete_Click"/>
         <Button Content="Main Page" Width="100" Height="50" Hyperlink.Click="Button_Click"  Margin="395,445,105,105"/>
         <!---Change button-->
         <Button x:Name="Change" Content="Change"  Width="50" Height="25" Margin="201,467,349,108" Click="Change_Click"/>
-        <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,162,0,0" VerticalAlignment="Top"/>
-        <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,204,0,0" VerticalAlignment="Top"/>
-        <Label Content="&lt;==" HorizontalAlignment="Left" Margin="350,242,0,0" VerticalAlignment="Top"/>
+        <Label Content="&lt;==" HorizontalAlignment="Left" Margin="319,137,0,0" VerticalAlignment="Top"/>
+        <Label Content="&lt;==" HorizontalAlignment="Left" Margin="319,215,0,0" VerticalAlignment="Top"/>
+        <Label Content="&lt;==" HorizontalAlignment="Left" Margin="319,253,0,0" VerticalAlignment="Top"/>
         <Button x:Name="DeleteBrand" Content="Delete Brand"  Width="90" Height="25" Margin="283,467,227,108" Click="DeleteBrand_Click"/>
-        <Button x:Name="refresh" Width="20" Height="20" Margin="18,12,362,568" Click="Refresh_Click">
+        <Button x:Name="refresh" Width="20" Height="20" Margin="76,12,504,568" Click="Refresh_Click">
             <Button.Content>
                 <Image  Source="/refresh.jpg" StretchDirection="Both"/>
             </Button.Content>

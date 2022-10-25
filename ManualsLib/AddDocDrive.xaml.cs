@@ -573,42 +573,50 @@ namespace ManualsLib
             string output = "";
             Regex alphabet = new Regex("[a-zA-Z0-9]");
             string[] iStr = alphabet.Split(iModel);
-            string sCh = "\\n|";
+            string sCh = @"\n|";
             string temp = "";
-            foreach (var i in iStr)
+            try
             {
-                temp = temp + i.Trim();
-            }
-            temp = temp.Trim();
-            if (temp != "")
-            {
-                foreach (var ch in iStr)
+                foreach (var i in iStr)
                 {
-                    if (ch != "")
+                    temp = temp + i.Trim();
+                }
+                temp = temp.Trim();
+                if (temp != "")
+                {
+                    foreach (var ch in iStr)
                     {
-                        sCh = sCh + "\\" + ch + "|";
+                        if (ch != "")
+                        {                           
+                            var chh = Regex.Escape(ch);
+                            sCh = sCh + chh + @"|";
+                        }
+                    }
+                    sCh = sCh.Remove(sCh.Length - 1);
+                    Regex speCh = new Regex(sCh);
+                    string[] Str = speCh.Split(iModel);
+                    ThongBao = "";
+                    foreach (var it in Str)
+                    {
+                        output = output + it;
+                    }
+                    output = output.ToLower();
+                }
+                else
+                {
+                    Regex speCh2 = new Regex("\n");
+                    string[] arrout = speCh2.Split(iModel);
+                    foreach (var item in arrout)
+                    {
+                        output = output + item;
                     }
                 }
-                sCh = sCh.Remove(sCh.Length - 1);
-                Regex speCh = new Regex(sCh);
-                string[] Str = speCh.Split(iModel);
-                ThongBao = "";
-                foreach (var it in Str)
-                {
-                    output = output + it;
-                }
-                output = output.ToLower();
             }
-            else
+            catch (Exception ex)
             {
-                Regex speCh2 = new Regex("\n");
-                string[] arrout = speCh2.Split(iModel);
-                foreach (var item in arrout)
-                {
-                    output = output + item;
-                }
-            }
 
+                ThongBao = ex.Message;
+            }
             return output;
         }
         private void Sub_Download(string fileId, string outputname)
@@ -656,10 +664,10 @@ namespace ManualsLib
             string inputBrand = "";
             string filename = "";
             string inputModel = "";
-            string templateBrand = "<!--Add new " + Model.Text + "-->" + "\n" + "<tr>" + "\n" + templateDoc + "<!--Add new " + Model.Text + "-->" + "\n";
+            string templateBrand = "<!--Add new " + Model.Text.Trim() + "-->" + "\n" + "<tr>" + "\n" + templateDoc + "<!--Add new " + Model.Text.Trim() + "-->" + "\n";
             string namePdf = pathSource.Substring(pathSource.LastIndexOf("\\") + 1, pathSource.Length - pathSource.LastIndexOf("\\") - 1);
             string drivePdfpath = "https://drive.google.com/file/d/pdfIdspath/view?usp=sharing";
-            if (brandName.SelectedItem.ToString() == "" || Title.Text == "" || Model.Text == "" || desPdfPath.Text == "")
+            if (brandName.SelectedItem.ToString() == "" || Title.Text == "" || Model.Text.Trim() == "" || desPdfPath.Text == "")
             {
                 if (brandName.SelectedItem.ToString() == "")
                 {
@@ -672,7 +680,7 @@ namespace ManualsLib
                     else
                     {
 
-                        if (Model.Text == "")
+                        if (Model.Text.Trim() == "")
                             ThongBao = "Model cannot empty";
                         else
                         {
@@ -689,16 +697,16 @@ namespace ManualsLib
                 filename = currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + ".html";
                 inputBrand = File.ReadAllText(filename);
                 string[] arrModel = inputBrand.Substring(inputBrand.IndexOf("<!--IndexModel") + 14, inputBrand.LastIndexOf("IndexModel-->") - inputBrand.IndexOf("<!--IndexModel") - 14).Trim().Split(";");
-                inputModel = Sub_String_To_String(Model.Text);
+                inputModel = Sub_String_To_String(Model.Text.Trim());
                 foreach (var it in arrModel)
                 {
                     if (inputModel == Sub_String_To_String(it))
                     {
-                        tb = tb + it + "\n";
+                        tb = tb + it ;
                     }
                 }
                 if (tb != "")
-                    ThongBao = $"Model existed. Check model: {tb}";
+                    ThongBao = $"Model existed. Check model: \n {tb}";
                 else
                 {
                     try
@@ -709,8 +717,8 @@ namespace ManualsLib
                         }
                         drivePdfpath = drivePdfpath.Replace("pdfIdspath", Sub_Get_Id(namePdf, "pdf"));
                         templateBrand = templateBrand.Replace("outputpdfPath", drivePdfpath);//outputpdfPath in template 
-                        templateBrand = templateBrand.Replace("outputTitle", Title.Text);//outputTitle
-                        templateBrand = templateBrand.Replace("outputModel", Model.Text);//outputModel
+                        templateBrand = templateBrand.Replace("outputTitle", Title.Text.Trim());//outputTitle
+                        templateBrand = templateBrand.Replace("outputModel", Model.Text.Trim());//outputModel
                         string revision = "";
                         if (string.IsNullOrEmpty(Revision.Text))
                         {
@@ -721,12 +729,12 @@ namespace ManualsLib
                             revision = Revision.Text;
                         }
                         templateBrand = templateBrand.Replace("outputRevision", revision);//outputRevision
-                                                                                               //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
+                                                                                          //Copy file pdf from Source to Database if error dont act  CANNOT OVERWRITE IF FILE PDF ALREADY EXIST 
                         filename = currPath + "\\Temporary\\" + brandName.SelectedItem.ToString() + ".html";
                         inputBrand = File.ReadAllText(filename);
                         int insertPos = (int)inputBrand.LastIndexOf(" </table>");
                         outputBrand = inputBrand.Insert(insertPos, templateBrand);
-                        outputBrand = outputBrand.Insert(outputBrand.LastIndexOf("IndexModel-->"), Model.Text + ";" + "\n");
+                        outputBrand = outputBrand.Insert(outputBrand.LastIndexOf("IndexModel-->"), Model.Text.Trim() + ";" + "\n");
                         File.WriteAllText(filename, outputBrand);
                         var pb = new List<string> { Sub_Get_Id(brandName.SelectedItem.ToString()) };
                         ParentPath = pb;

@@ -13,9 +13,9 @@
         <Button Content="Add Document" Visibility="Hidden" Width="100" Height="50" Hyperlink.Click="Button_Click" Margin="50,61,50,373"></Button>
         <Button Content="Edit Document" Width="100" Height="50" Hyperlink.Click="Button_Click_1"  Margin="50,187,50,263"></Button>
         <Button Content="Add Document" Width="100" Height="50" Hyperlink.Click="Button_Click_2" Margin="50,96,50,354" />
-
-        <TextBox x:Name="CheckResult" Visibility="Visible"  Text="CheckResult" TextWrapping="Wrap" Width="120" Height="20" Margin="40,340,40,140"/>
-        <Label Content="MainWindow" HorizontalAlignment="Left" Height="27" Margin="71,32,0,0" VerticalAlignment="Top" Width="83"/>
+        <Button Content="Open Masterlist" Width="100" Height="50" Click="Button_Click_3" Visibility="Hidden"  Margin="50,277,50,173"></Button>
+        <TextBox x:Name="CheckResult" Visibility="Hidden"  Text="CheckResult" TextWrapping="Wrap" Width="120" Height="20" Margin="40,340,40,140"/>
+        <Label Content="MainWindow" HorizontalAlignment="Center" Height="27" Margin="0,32,0,0" VerticalAlignment="Top" Width="82"/>
 
     </Grid>
 </Window>

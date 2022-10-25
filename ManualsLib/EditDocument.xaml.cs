@@ -183,6 +183,7 @@ namespace ManualsLib
             Sub_Delete_Drive(brandID);
             Sub_Upload(filename, dataId, brandName.SelectedItem.ToString()+".html","html");            
             CheckResult.Text = $"Deleted database of {Model.SelectedItem.ToString()}";
+            brandID = Sub_Get_Id(Model.SelectedItem.ToString() + ".html", "html");
 
             Sub_Window_Loaded();
             //}

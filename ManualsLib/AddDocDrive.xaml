@@ -10,25 +10,25 @@
     <Grid Background="LightGray" Width="400" Height="600" Margin="0,0,0,-16">
         <Label Content="Add Document" Width="400" Height="50" FontSize="20" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" Grid.ColumnSpan="2"                             />
         <!--Brandname selector-->
-        <Label Margin="10,120,300,450" Width="80" Height="30" Grid.Column="1" Content="Brand name:" />
-        <ComboBox x:Name="brandName" SelectionChanged="brandName_SelectionChanged"   Margin="125,120,115,450" Width="150" Height="30" Grid.Column="1" />
-        <Label Content="New Brand" HorizontalAlignment="Left" Margin="303,89,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="newBrand"  Margin="297,120,23,450" Width="70" Height="30" Grid.Column="1"/>
+        <Label Margin="15,96,305,474" Width="80" Height="30" Content="Brand name:" />
+        <ComboBox x:Name="brandName" SelectionChanged="brandName_SelectionChanged"   Margin="130,96,120,474" Width="150" Height="30" />
+        <Label Content="New Brand" HorizontalAlignment="Left" Margin="303,65,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="newBrand"  Margin="302,96,28,474" Width="70" Height="30"/>
         <!--Title selector-->
-        <Label Margin="10,160,300,410" Width="80" Height="30" Grid.Column="1"  Content="Title:"  />
-        <TextBox x:Name="Title" TextWrapping="Wrap" Width="150" Height="30" Margin="125,160,115,410" Grid.Column="1"/>
+        <Label Margin="15,136,305,434" Width="80" Height="30"  Content="Title:"  />
+        <TextBox x:Name="Title" TextWrapping="Wrap" Width="150" Height="60" Margin="130,134,120,406"/>
         <!--Model selector-->
-        <Label Margin="10,201,300,369" Width="80" Height="30" Grid.Column="1"  Content="Model:"  />
-        <TextBox x:Name="Model" TextWrapping="Wrap" Width="150" Height="30" Margin="125,201,115,369" Grid.Column="1"/>
+        <Label Margin="15,205,305,365" Width="80" Height="30"  Content="Model:"  />
+        <TextBox x:Name="Model" TextWrapping="Wrap" Width="150" Height="30" Margin="130,203,120,367"/>
         <!--Revision selector-->
-        <Label Margin="10,240,300,330" Width="80" Height="30" Grid.Column="1"  Content="Revision:"  />
-        <TextBox x:Name="Revision" TextWrapping="Wrap" Width="150" Height="30" Margin="125,240,115,330" Grid.Column="1"/>
+        <Label Margin="15,243,305,327" Width="80" Height="30"  Content="Revision:"  />
+        <TextBox x:Name="Revision" TextWrapping="Wrap" Width="150" Height="30" Margin="130,241,120,329"/>
         <!--Source file pdf selector-->
-        <Label Margin="10,281,300,289" Width="80" Height="30" Grid.Column="1"  Content="Source:"  />
+        <Label Margin="15,287,305,283" Width="80" Height="30"  Content="Source:"  />
         <!--path to source file-->
-        <TextBox x:Name="desPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="150,288,40,252" Background="LightGray" BorderBrush="LightGray" Grid.Column="1"/>
-        <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="127,290,243,290" Grid.Column="1" Click="desPdf_Click"/>
-        <TextBox x:Name="CheckResult" IsReadOnly="True" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="desPdfPath" IsReadOnly="True" TextWrapping="Wrap" Width="200" Height="60" Margin="155,291,45,249" Background="LightGray" BorderBrush="LightGray"/>
+        <Button x:Name="desPdf" Content="..."  Width="20" Height="20" Margin="132,289,248,291" Click="desPdf_Click"/>
+        <TextBox x:Name="CheckResult" VerticalScrollBarVisibility="Visible" IsReadOnly="True" TextWrapping="Wrap" Width="400" Height="60" Margin="0,370,0,170" Grid.ColumnSpan="2"/>
         <!--Add button-->
         <Button x:Name="AddDoc" Content="Insert Document" Click="AddDoc_Click"  Width="100" Height="30" Margin="10,467,280,103"  Grid.Column="1"/>
         <Button x:Name="AddBrand" Content="Insert Brand" Click="AddBrand_Click"  Width="100" Height="30" Margin="140,467,150,103"  Grid.Column="1"/>
@@ -38,6 +38,6 @@
                 <Image  Source="/refresh.jpg" StretchDirection="Both"/>
             </Button.Content>
         </Button>
-        
+
     </Grid>
 </Window>
